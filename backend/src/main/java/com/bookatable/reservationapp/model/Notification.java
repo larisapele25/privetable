@@ -23,6 +23,8 @@ public class Notification {
 
     private Long reservationId;
 
+    private Long verificationId;
+
     @ManyToOne
     @JsonIgnoreProperties({"verifications", "notifications", "password", "resetCode", "resetCodeTimestamp"})
     private User recipient;
@@ -73,4 +75,13 @@ public class Notification {
     public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
     }
+
+    public Long getVerificationId() {
+        return verificationId;
+    }
+
+    public void setVerificationId(Long verificationId) {
+        this.verificationId = verificationId;
+    }
+
 }

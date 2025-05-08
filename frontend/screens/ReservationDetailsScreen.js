@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API } from '../services/api';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -12,34 +21,11 @@ const ReservationDetailsScreen = () => {
 
   const [reservation, setReservation] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  
   const [total, setTotal] = useState(0);
   const [userTotal, setUserTotal] = useState(0);
-  const { userId } = useContext(FavoriteContext);
   const [participants, setParticipants] = useState([]);
+  const { userId } = useContext(FavoriteContext);
 
-  
-  useEffect(() => {
-    if (reservation) {
-      console.log('reservation full:', reservation);
-    }
-  }, [reservation]);
-  
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      title: '',
-      headerBackVisible: false,
-      headerTransparent: true,
-      headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('CartScreen',{reservationId})} style={{ marginRight: 20, paddingTop: 40 }}>
-          <Icon name="cart-outline" size={24} color="black" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-  
   useEffect(() => {
     API.get(`/reservations/${reservationId}`)
       .then(response => {
@@ -60,7 +46,7 @@ const ReservationDetailsScreen = () => {
         .catch(err => console.error('Error fetching total:', err));
     }
   }, [reservationId]);
-  
+
   useEffect(() => {
     if (reservationId && userId) {
       API.get(`/cart/total/${reservationId}/user/${userId}`)
@@ -68,21 +54,34 @@ const ReservationDetailsScreen = () => {
         .catch(err => console.error('Error fetching user total:', err));
     }
   }, [reservationId, userId]);
-  
-  if (loading) return (
-    <SafeAreaView style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#000" />
-    </SafeAreaView>
-  );
 
-  if (!reservation) return (
-    <SafeAreaView style={styles.loadingContainer}>
-      <Text style={styles.errorText}>Reservation not found</Text>
-    </SafeAreaView>
-  );
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
+      </SafeAreaView>
+    );
+  }
+
+  if (!reservation) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <Text style={styles.errorText}>Reservation not found</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Cart icon floating */}
+      <View style={styles.cartIconContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CartScreen', { reservationId })}
+        >
+          <Icon name="cart-outline" size={26} color="black" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.detailsContainer}>
           <Text style={styles.title}>{reservation.restaurantName}</Text>
@@ -93,21 +92,21 @@ const ReservationDetailsScreen = () => {
             {reservation.numberOfPeople} persons • {reservation.duration}h
           </Text>
         </View>
-        <View style={{ marginTop: 20 }}>
-  <Text style={styles.sectionHeader}>Participants:</Text>
-  {participants.length === 0 ? (
-    <Text style={styles.subText}>Only you for now.</Text>
-  ) : (
-    participants.map((email, idx) => (
-      <Text key={idx} style={styles.subText}>• {email}</Text>
-    ))
-  )}
-</View>
 
+        <View style={{ marginTop: 20 }}>
+          <Text style={styles.sectionHeader}>Participants:</Text>
+          {participants.length === 0 ? (
+            <Text style={styles.subText}>Only you for now.</Text>
+          ) : (
+            participants.map((email, idx) => (
+              <Text key={idx} style={styles.subText}>• {email}</Text>
+            ))
+          )}
+        </View>
 
         <View style={styles.buttonGroup}>
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.baseButton, styles.button]}
             onPress={() => navigation.navigate('InviteScreen', { reservationId })}
           >
             <Icon name="person-add-outline" size={20} color="white" />
@@ -115,38 +114,35 @@ const ReservationDetailsScreen = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.baseButton, styles.button]}
             onPress={() => navigation.navigate('MenuScreen', {
               reservationId: reservation.id,
               restaurantId: reservation.restaurantId
             })}
-            
           >
             <Icon name="book-outline" size={20} color="white" />
             <Text style={styles.buttonText}>View Menu</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-  style={styles.payButton}
-  onPress={() => navigation.navigate('PaymentScreen', {
-    amount: total * 100, // Stripe cere bani, nu lei
-    name: 'Plată masă'
-  })}
->
-  <Text style={styles.buttonText}>TotalTableAmount: {total} lei</Text>
-</TouchableOpacity>
+            style={styles.baseButton}
+            onPress={() => navigation.navigate('PaymentScreen', {
+              amount: total * 100,
+              name: 'Plată masă'
+            })}
+          >
+            <Text style={styles.buttonText}>Total masă: {total} RON</Text>
+          </TouchableOpacity>
 
-<TouchableOpacity
-  style={styles.payButton}
-  onPress={() => navigation.navigate('PaymentScreen', {
-    amount: userTotal * 100,
-    name: 'Plată personală'
-  })}
->
-  <Text style={styles.buttonText}>PersonalTotal: {userTotal} lei</Text>
-</TouchableOpacity>
-
-
+          <TouchableOpacity
+            style={styles.baseButton}
+            onPress={() => navigation.navigate('PaymentScreen', {
+              amount: userTotal * 100,
+              name: 'Plată personală'
+            })}
+          >
+            <Text style={styles.buttonText}>Total personal: {userTotal} RON</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -157,6 +153,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  cartIconContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 60 : 30,
+    right: 40,
+    zIndex: 999,
+    marginTop: 40,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '500',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   subText: {
     fontSize: 16,
@@ -189,40 +192,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
   },
-  buttonGroup: {
+  baseButton: {
+    backgroundColor: 'black',
+    paddingVertical: 14,
+    borderRadius: 20,
     alignItems: 'center',
-    gap: 16,
-    marginBottom: 180,
-
+    justifyContent: 'center',
+    width: 300,
   },
   button: {
     flexDirection: 'row',
-    backgroundColor: 'black',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-    alignItems: 'center',
     gap: 8,
-    minWidth: 240,
-    justifyContent: 'center',
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
-  },
-  payButton: {
-    backgroundColor: 'black',
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 20,
-    alignItems: 'center',
-    minWidth: 240,
-  },
-  payText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 16,
+    textAlign: 'center',
   },
   sectionHeader: {
     fontSize: 18,
@@ -231,7 +217,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  
+  buttonGroup: {
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 180,
+    marginTop: 20,
+  },
 });
 
 export default ReservationDetailsScreen;

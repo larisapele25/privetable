@@ -8,6 +8,7 @@ import { FavoriteContext } from '../context/FavoriteContext';
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [acceptedReservationIds, setAcceptedReservationIds] = useState([]);
+  const [verificationStatuses, setVerificationStatuses] = useState({});
   const { userId } = useContext(FavoriteContext);
 
   useEffect(() => {
@@ -22,8 +23,6 @@ const NotificationsScreen = () => {
         await API.put(`/notifications/mark-as-read/${finalUserId}`);
 
         const notiRes = await API.get(`/notifications/${finalUserId}`);
-        console.log("Notificări primite:", notiRes.data);
-
         const allNotifications = Array.isArray(notiRes.data) ? notiRes.data : [];
 
         const reservationsRes = await API.get(`/reservations/upcoming?userId=${finalUserId}`);
@@ -36,8 +35,22 @@ const NotificationsScreen = () => {
         );
 
         setNotifications(filtered);
+
+        // Obține statusul pentru fiecare verificare
+        const verifStatuses = {};
+        for (let n of filtered) {
+          if (n.type === 'VERIFICATION' && n.verificationId) {
+            try {
+              const res = await API.get(`/verify/status/${n.verificationId}`);
+              verifStatuses[n.verificationId] = res.data.status;
+            } catch (e) {
+              console.error(`Eroare la status verificare ${n.verificationId}:`, e.message);
+            }
+          }
+        }
+        setVerificationStatuses(verifStatuses);
       } catch (err) {
-        console.error('Error fetching notifications:', err);
+        console.error('Eroare la încărcarea notificărilor:', err);
       }
     };
 
@@ -65,10 +78,11 @@ const NotificationsScreen = () => {
   };
 
   const renderItem = ({ item }) => (
+    
+  
     <View style={styles.card}>
       <Text style={styles.message}>{item.message}</Text>
       <Text style={styles.timestamp}>{format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}</Text>
-
       {item.type === 'INVITE' && item.reservationId && (
         !acceptedReservationIds.includes(item.reservationId) ? (
           <TouchableOpacity
@@ -82,14 +96,13 @@ const NotificationsScreen = () => {
         )
       )}
 
-      {item.type === 'VERIFICATION' && (
-        <Text style={{ color: 'green', marginTop: 10, fontStyle: 'italic' }}>
-          Status: {item.reviewed ? 'Finalizat' : 'În curs'}
+      {item.type === 'VERIFICATION' && item.verificationId && (
+        <Text style={styles.statusText}>
+          Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
         </Text>
       )}
     </View>
-  );
-
+  )
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>NOTIFICĂRI</Text>
@@ -138,6 +151,12 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontStyle: 'italic',
   },
+  statusText: {
+    marginTop: 10,
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 14,
+  }
 });
 
 export default NotificationsScreen;

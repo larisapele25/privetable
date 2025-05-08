@@ -1,22 +1,19 @@
 package com.bookatable.reservationapp.service;
-
 import com.bookatable.reservationapp.dto.VerificationRequestDTO;
-import com.bookatable.reservationapp.model.Notification;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.model.UserVerification;
-import com.bookatable.reservationapp.repository.NotificationRepository;
 import com.bookatable.reservationapp.repository.UserRepository;
 import com.bookatable.reservationapp.repository.UserVerificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -30,10 +27,7 @@ public class VerificationService {
     @Autowired
     private UserVerificationRepository verificationRepository;
 
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    public void submitVerification(VerificationRequestDTO dto) throws IOException {
+    public UserVerification submitVerification(VerificationRequestDTO dto) throws IOException {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -53,18 +47,10 @@ public class VerificationService {
         verification.setReviewedByAdmin(false);
         verification.setUser(user);
 
-        verificationRepository.save(verification);
-
-        // Notificare: verificare în curs
-        Notification noti = new Notification();
-        noti.setRecipient(user);
-        noti.setType("VERIFICATION");
-        noti.setMessage("Verificarea contului este în curs. Poate dura până la 24h.");
-        noti.setTimestamp(LocalDateTime.now());
-
-        notificationRepository.save(noti);
+        UserVerification saved = verificationRepository.save(verification);
 
         System.out.println("✅ Verificare salvată pentru userId=" + user.getId());
+        return saved;
     }
 
     private String saveImage(MultipartFile image, String prefix) throws IOException {
@@ -75,7 +61,7 @@ public class VerificationService {
             }
         }
 
-        String extension = ".jpg"; // Poți extrage și din `image.getOriginalFilename()` dacă vrei
+        String extension = ".jpg";
         String filename = prefix + "_" + UUID.randomUUID() + extension;
         Path filePath = new File(dir, filename).toPath();
 

@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/verify")
+@RequestMapping("api/verify")
 public class VerificationController {
 
     @Autowired
@@ -66,7 +67,7 @@ public class VerificationController {
             dto.setFrontImage(frontImage);
             dto.setBackImage(backImage);
 
-            verificationService.submitVerification(dto);
+            UserVerification saved = verificationService.submitVerification(dto);
 
             // 🔔 Notificare: verificare în curs
             Notification noti = new Notification();
@@ -74,6 +75,7 @@ public class VerificationController {
             noti.setType("VERIFICATION");
             noti.setMessage("Verificarea contului este în curs. Poate dura până la 24h.");
             noti.setTimestamp(LocalDateTime.now());
+            noti.setVerificationId(saved.getId());
             notificationRepository.save(noti);
 
             return ResponseEntity.ok("Verificare trimisă. Un administrator o va procesa manual.");
@@ -103,7 +105,15 @@ public class VerificationController {
                 noti.setType("VERIFICATION");
                 noti.setMessage("Contul tău a fost verificat cu succes.");
                 noti.setTimestamp(LocalDateTime.now());
+
+//  Siguranță: setează ID-ul explicit DOAR dacă este salvat
+                if (verification.getId() != null) {
+                    noti.setVerificationId(verification.getId());
+                } else {
+                    System.out.println(" WARNING: verification ID is null!");
+                }
                 notificationRepository.save(noti);
+
             }
 
             return ResponseEntity.ok("Verificare aprobată.");
@@ -130,6 +140,7 @@ public class VerificationController {
                 }
                 noti.setMessage(message);
                 noti.setTimestamp(LocalDateTime.now());
+                noti.setVerificationId(verification.getId());
                 notificationRepository.save(noti);
             }
 
@@ -140,16 +151,22 @@ public class VerificationController {
     @GetMapping("/status/{id}")
     public ResponseEntity<?> getVerificationStatus(@PathVariable Long id) {
         return verificationRepository.findById(id)
-                .map(verification -> ResponseEntity.ok(Map.of(
-                        "status", verification.isVerificationStatus() ? "APPROVED" : "PENDING",
-                        "reviewed", verification.isReviewedByAdmin(),
-                        "comment", verification.getAdminComment()
-                )))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                        "error", "Verificarea nu a fost găsită"
-                )));
+                .map(verification -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("status", verification.isVerificationStatus() ? "APPROVED" : "PENDING");
+                    response.put("reviewed", verification.isReviewedByAdmin());
+                    response.put("comment", verification.getAdminComment()); // poate fi null, e OK
+                    return ResponseEntity.ok(response);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        Map.of("error", "Verificarea nu a fost găsită")
+                ));
     }
 
+
+
+
+    // ✅ Obține toate verificările
     @GetMapping("/all")
     public ResponseEntity<?> getAllVerifications() {
         return ResponseEntity.ok(verificationRepository.findAll());
