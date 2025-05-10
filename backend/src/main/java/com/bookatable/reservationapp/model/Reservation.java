@@ -20,6 +20,8 @@ public class Reservation {
     @Column(name = "duration")
     private Integer duration = 1;
 
+    @Column(name = "notified")
+    private Boolean notified = false;
 
     private LocalDateTime dateTime;
 
@@ -106,5 +108,11 @@ public class Reservation {
         this.participants = participants;
     }
 
+    public Boolean isNotified() {
+        return notified;
+    }
 
+    public void setNotified(Boolean notified) {
+        this.notified = notified;
+    }
 }

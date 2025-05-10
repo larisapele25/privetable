@@ -15,12 +15,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.IntStream;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public ReservationService(ReservationRepository reservationRepository, RestaurantRepository restaurantRepository) {
         this.reservationRepository = reservationRepository;
@@ -35,7 +39,8 @@ public class ReservationService {
                     res.getRestaurant().getName(),
                     res.getDateTime(),
                     res.getNumberOfPeople(),
-                    res.getDuration()
+                    res.getDuration(),
+                    res.getUser().getId()
             );
         } else {
             throw new RuntimeException("Reservation not found");
@@ -203,6 +208,51 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    @Scheduled(fixedRate = 60 * 60 * 1000) // la fiecare oră
+    public void sendUpcomingReservationReminders() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime in2Hours = now.plusHours(2);
+
+        List<Reservation> upcoming = reservationRepository
+                .findByDateTimeBetweenAndNotifiedFalse(now, in2Hours);
+
+        for (Reservation res : upcoming) {
+            User user = res.getUser();
+            String restaurantName = res.getRestaurant().getName();
+            String time = res.getDateTime().toLocalTime().toString();
+
+            emailService.sendReservationReminderEmail(
+                    user.getEmail(),
+                    user.getFirstName(),
+                    restaurantName,
+                    time
+            );
+
+
+            res.setNotified(true);
+            reservationRepository.save(res);
+        }
+    }
+
+    public void cancelReservation(Long reservationId, Long userId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Rezervarea nu există"));
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Doar creatorul poate anula această rezervare");
+        }
+
+        if (reservation.getDateTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Rezervarea a trecut deja și nu mai poate fi anulată");
+        }
+        if (reservation.getDateTime().minusHours(2).isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Rezervarea poate fi anulată doar cu minim 2 ore înainte.");
+        }
+
+
+        // aici poți avea și un câmp status (ex: "CANCELLED"), dar pentru simplitate:
+        reservationRepository.delete(reservation);
+    }
 
 
 

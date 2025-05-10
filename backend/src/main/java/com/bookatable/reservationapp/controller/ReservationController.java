@@ -92,7 +92,8 @@ public class ReservationController {
         result.put("duration", reservation.getDuration());
         result.put("numberOfPeople", reservation.getNumberOfPeople());
         result.put("restaurantName", reservation.getRestaurant().getName());
-        result.put("restaurantId", reservation.getRestaurant().getId()); //
+        result.put("restaurantId", reservation.getRestaurant().getId());
+        result.put("createdById", reservation.getUser().getId());
         List<String> participantEmails = reservation.getParticipants()
                 .stream()
                 .map(User::getEmail)
@@ -126,6 +127,14 @@ public class ReservationController {
         return ResponseEntity.ok("Joined");
     }
 
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<String> cancelReservation(
+            @PathVariable Long id,
+            @RequestParam Long userId // sau extragi din JWT dacă ai autentificare
+    ) {
+        reservationService.cancelReservation(id, userId);
+        return ResponseEntity.ok("Rezervarea a fost anulată");
+    }
 
 
 

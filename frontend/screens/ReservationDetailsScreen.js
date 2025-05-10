@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API } from '../services/api';
@@ -55,6 +56,30 @@ const ReservationDetailsScreen = () => {
     }
   }, [reservationId, userId]);
 
+  const handleCancelReservation = () => {
+    Alert.alert(
+      'Confirmare',
+      'Ești sigur că vrei să anulezi rezervarea?',
+      [
+        { text: 'Nu' },
+        {
+          text: 'Da',
+          onPress: async () => {
+            try {
+              await API.post(`/reservations/${reservation.id}/cancel?userId=${userId}`);
+              Alert.alert("Rezervare anulată cu succes");
+              navigation.goBack();
+            } catch (error) {
+              const message = error?.response?.data?.message || 'A apărut o eroare.';
+              Alert.alert("Eroare", message);
+            }
+          },
+        },
+      ]
+    );
+  };
+  
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -71,9 +96,15 @@ const ReservationDetailsScreen = () => {
     );
   }
 
+  const isCreator = reservation.createdById === userId;
+  console.log (isCreator);
+  console.log('reservation.createdById:', reservation.createdById);
+console.log('userId:', userId);
+console.log('Match:', reservation.createdById === userId);
+
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Cart icon floating */}
       <View style={styles.cartIconContainer}>
         <TouchableOpacity
           onPress={() => navigation.navigate('CartScreen', { reservationId })}
@@ -143,6 +174,15 @@ const ReservationDetailsScreen = () => {
           >
             <Text style={styles.buttonText}>Total personal: {userTotal} RON</Text>
           </TouchableOpacity>
+
+          {isCreator && (
+            <TouchableOpacity
+              style={[styles.baseButton, { backgroundColor: 'red' }]}
+              onPress={handleCancelReservation}
+            >
+              <Text style={styles.buttonText}>Anulează rezervarea</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

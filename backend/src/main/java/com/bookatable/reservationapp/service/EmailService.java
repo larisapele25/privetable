@@ -14,7 +14,7 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     public void sendResetCodeEmail(String to, String code) {
-            System.out.println("🔔 Trimit email către: " + to + " cu codul: " + code);
+            System.out.println(" Trimit email către: " + to + " cu codul: " + code);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Resetare parolă - BookApp");
@@ -22,4 +22,18 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendReservationReminderEmail(String to, String name, String restaurant, String time) {
+        System.out.println("🔔 Trimit reminder către: " + to);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Reminder rezervare - BookApp");
+        message.setText(
+                "Hei " + name + ",\n\n" +
+                        "Ai o rezervare la restaurantul " + restaurant + " azi la ora " + time + ".\n" +
+                        "Dacă vrei să anulezi sau să reprogramezi, intră în aplicație.\n\n" +
+                        "Echipa PrivéTable"
+        );
+        mailSender.send(message);
+    }
+
 }

@@ -33,5 +33,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     //adaugari
     List<Reservation> findByUser(User user);
     List<Reservation> findByParticipantsContaining(User user);
+    List<Reservation> findByDateTimeBetweenAndNotifiedFalse(LocalDateTime start, LocalDateTime end);
+
 
 }
