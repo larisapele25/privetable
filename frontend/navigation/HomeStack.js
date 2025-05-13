@@ -9,7 +9,7 @@ import NotificationsScreen from '../screens/NotificationScreen';
 import MenuScreen from '../screens/MenuScreen';
 import CartScreen from '../screens/CartScreen';
 import PaymentScreen from '../screens/PaymentScreen';
-import VerificationScreen from '../screens/VerificationScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function HomeStack() {
@@ -24,8 +24,6 @@ export default function HomeStack() {
       <Stack.Screen name="MenuScreen" component={MenuScreen} />
       <Stack.Screen name="CartScreen" component={CartScreen} />
       <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
-      <Stack.Screen name="Verification" component={VerificationScreen}/>
-
     </Stack.Navigator>
   );
 }

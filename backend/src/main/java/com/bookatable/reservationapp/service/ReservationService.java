@@ -254,6 +254,33 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
+    public List<Reservation> getForRestaurant(Long restaurantId) {
+        return reservationRepository.findByRestaurantId(restaurantId);
+    }
+
+    public List<ReservationDetailsDTO> getReservationDetailsForRestaurant(Long restaurantId) {
+        List<Reservation> reservations = reservationRepository.findByRestaurantId(restaurantId);
+
+        return reservations.stream()
+                .map(res -> new ReservationDetailsDTO(
+                        res.getRestaurant().getName(),
+                        res.getDateTime(),
+                        res.getNumberOfPeople(),
+                        res.getDuration(),
+                        res.getUser().getId()
+                ))
+                .toList();
+    }
+    public List<ReservationDetailsDTO> getReservationsForDate(Long restaurantId, LocalDate date) {
+        return reservationRepository.findByRestaurantIdAndDateExact(restaurantId, date).stream()
+                .map(res -> new ReservationDetailsDTO(
+                        res.getRestaurant().getName(),
+                        res.getDateTime(),
+                        res.getNumberOfPeople(),
+                        res.getDuration(),
+                        res.getUser().getId()
+                )).toList();
+    }
 
 
 

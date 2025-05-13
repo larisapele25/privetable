@@ -9,6 +9,9 @@ import MainTabNavigator from './navigation/MainTabNavigator';
 import { FavoriteProvider } from './context/FavoriteContext';
 import ChangePasswordScreen from './screens/ChangePasswordScreen';
 import VerificationScreen from './screens/VerificationScreen';
+import RestaurantLoginScreen from './screens/RestaurantLoginScreen';
+import RestaurantDashboard from './screens/RestaurantDashboard';
+import ProductManagerScreen from './screens/ProductManagerScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -23,7 +26,10 @@ export default function App() {
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
           <Stack.Screen name="Verification" component={VerificationScreen}/>
           <Stack.Screen name="ChangePassword" component={ChangePasswordScreen}/>
-         
+          <Stack.Screen name="RestaurantLogin" component={RestaurantLoginScreen} />
+          <Stack.Screen name="RestaurantDashboard" component={RestaurantDashboard} />
+          <Stack.Screen name="ProductManager" component={ProductManagerScreen} />
+
           <Stack.Screen
             name="ForgotPassword"
             component={ForgotPasswordScreen}

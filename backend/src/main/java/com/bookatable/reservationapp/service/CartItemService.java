@@ -1,5 +1,6 @@
 package com.bookatable.reservationapp.service;
 
+import com.bookatable.reservationapp.dto.OrderDTO;
 import com.bookatable.reservationapp.model.CartItem;
 import com.bookatable.reservationapp.model.Product;
 import com.bookatable.reservationapp.model.Reservation;
@@ -11,6 +12,7 @@ import com.bookatable.reservationapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,6 +96,28 @@ public class CartItemService {
         item.setUser(newUser);
         return cartItemRepository.save(item);
     }
+
+    public List<CartItem> getOrdersForRestaurant(Long restaurantId) {
+        return cartItemRepository.findByProductRestaurantId(restaurantId);
+    }
+
+    public List<CartItem> getOrdersForDate(Long restaurantId, LocalDate date) {
+        return cartItemRepository.findByRestaurantIdAndDate(restaurantId, date);
+    }
+
+    public List<OrderDTO> getOrderDTOsForDate(Long restaurantId, LocalDate date) {
+        List<CartItem> items = cartItemRepository.findByRestaurantIdAndDate(restaurantId, date);
+
+        return items.stream()
+                .map(item -> new OrderDTO(
+                        item.getProduct().getName(),
+                        item.getQuantity(),
+                        item.getUser().getFirstName() + " " + item.getUser().getLastName(),
+                        item.getAddedAt()
+                ))
+                .toList();
+    }
+
 
 
 }

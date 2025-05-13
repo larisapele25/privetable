@@ -34,6 +34,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByUser(User user);
     List<Reservation> findByParticipantsContaining(User user);
     List<Reservation> findByDateTimeBetweenAndNotifiedFalse(LocalDateTime start, LocalDateTime end);
+    List<Reservation> findByRestaurantId(Long restaurantId);
+    @Query("SELECT r FROM Reservation r WHERE r.restaurant.id = :restaurantId AND DATE(r.dateTime) = :date")
+    List<Reservation> findByRestaurantIdAndDateExact(
+            @Param("restaurantId") Long restaurantId,
+            @Param("date") LocalDate date
+    );
 
 
 }

@@ -39,4 +39,20 @@ public class ReservationDetailsDTO {
         return createdById;
     }
 
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+    public void setNumberOfPeople(int numberOfPeople) {
+        this.numberOfPeople = numberOfPeople;
+    }
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+    public void setCreatedById(Long createdById) {
+        this.createdById = createdById;
+    }
+
 }

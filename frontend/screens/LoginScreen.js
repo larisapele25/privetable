@@ -117,6 +117,10 @@ export default function LoginScreen({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.link}>Don't have an account?</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('RestaurantLogin')}>
+  <Text style={styles.link}>Login ca restaurant</Text>
+</TouchableOpacity>
+
     </View>
   );
 }
