@@ -6,6 +6,8 @@ import com.bookatable.reservationapp.dto.RegisterRequest;
 import com.bookatable.reservationapp.dto.ResetPasswordRequest;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.service.AuthService;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,10 +46,7 @@ public class AuthController {
     }
 
 
-    @GetMapping("/ping")
-    public String ping() {
-        return "pong";
-    }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
@@ -59,5 +58,28 @@ public class AuthController {
         authService.resetPassword(request);
         return ResponseEntity.ok("Parola a fost resetată cu succes.");
     }
+
+    @PostMapping("/firebase-login")
+    public ResponseEntity<?> loginWithFirebase(@RequestBody Map<String, String> body) {
+        String idToken = body.get("token");
+
+        try {
+            // Verifici tokenul primit de la frontend cu Firebase Admin SDK
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String email = decodedToken.getEmail();
+            String name = (String) decodedToken.getClaims().get("name");
+
+            User user = authService.findOrCreateFirebaseUser(email, name);
+
+            return ResponseEntity.ok(Map.of(
+                    "userId", user.getId(),
+                    "message", "Login Firebase reușit"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("message", "Token Firebase invalid: " + e.getMessage()));
+        }
+    }
+
+
 
 }

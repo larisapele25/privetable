@@ -1,5 +1,6 @@
 package com.bookatable.reservationapp.controller;
 
+import com.bookatable.reservationapp.dto.ChangeEmailRequest;
 import com.bookatable.reservationapp.dto.ChangePasswordRequest;
 import com.bookatable.reservationapp.dto.UserDTO;
 import com.bookatable.reservationapp.model.Restaurant;
@@ -70,10 +71,42 @@ import java.util.Set;
     }
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        System.out.println("🟢 ID primit: " + request.getUserId());
+        System.out.println("ID primit: " + request.getUserId());
         authService.changePassword(request);
         return ResponseEntity.ok("Password changed successfully");
     }
+
+    @PutMapping("/change-email")
+    public ResponseEntity<?> changeEmail(@RequestBody ChangeEmailRequest request) {
+        Optional<User> userOptional = userRepository.findById(request.getUserId());
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        User user = userOptional.get();
+
+        // Folosești metoda adăugată acum
+        if (!authService.checkPassword(user, request.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Parola este greșită.");
+        }
+
+        if (!request.getNewEmail().equals(request.getConfirmEmail())) {
+            return ResponseEntity.badRequest().body("Emailurile nu coincid.");
+        }
+
+        if (!request.getNewEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            return ResponseEntity.badRequest().body("Emailul nu este valid.");
+        }
+
+        // Salvezi noul email
+        user.setEmail(request.getNewEmail());
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Email actualizat cu succes.");
+    }
+
+
 
 
 

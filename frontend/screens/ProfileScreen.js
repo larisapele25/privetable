@@ -14,10 +14,30 @@ import { useNavigation } from '@react-navigation/native';
 import { useContext } from 'react';
 import { FavoriteContext } from '../context/FavoriteContext';
 import LoginScreen from './LoginScreen';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const { logout } = useContext(FavoriteContext);
+
+  useFocusEffect(
+  React.useCallback(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('userId');
+        if (!userId) return;
+
+        const res = await API.get(`/users/${userId}`);
+        setUser(res.data);
+      } catch (err) {
+        console.log('Failed to fetch user', err.message);
+      }
+    };
+
+    fetchUserData();
+  }, [])
+);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -57,12 +77,14 @@ const ProfileScreen = ({ navigation }) => {
         <>
           <Text style={styles.name}>{user.name}</Text>
 
-          <View style={styles.rowItem}>
+       <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate('ChangeEmail')}>
   <View>
     <Text style={styles.label}>EMAIL</Text>
     <Text style={styles.value}>{user.email}</Text>
   </View>
-</View>
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
+
 
 
           <View style={styles.infoBox}>

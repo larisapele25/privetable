@@ -7,16 +7,13 @@ import { FavoriteContext } from '../context/FavoriteContext';
 const MenuScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { reservationId, restaurantId } = route.params;
+  const { reservationId, restaurantId, readOnly } = route.params; // ✅ citim readOnly
   const { userId } = useContext(FavoriteContext);
 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
   const [total, setTotal] = useState(0);
 
-  console.log("user:",userId);
-  console.log ("restaurantID:", restaurantId);
-  console.log ("reservationID:", reservationId);
   useEffect(() => {
     if (restaurantId) {
       API.get(`/products/restaurant/${restaurantId}`)
@@ -26,6 +23,7 @@ const MenuScreen = () => {
   }, [restaurantId]);
 
   const addToCart = (product) => {
+    if (readOnly) return; // ✅ prevenim acțiunea în mod read-only
     const updatedCart = { ...cart };
     updatedCart[product.id] = updatedCart[product.id]
       ? { ...product, quantity: updatedCart[product.id].quantity + 1 }
@@ -35,6 +33,7 @@ const MenuScreen = () => {
   };
 
   const removeFromCart = (product) => {
+    if (readOnly) return; // ✅ prevenim acțiunea în mod read-only
     const updatedCart = { ...cart };
     if (updatedCart[product.id]) {
       updatedCart[product.id].quantity -= 1;
@@ -63,6 +62,7 @@ const MenuScreen = () => {
   const grouped = groupByCategory(products);
 
   const handlePlaceOrder = async () => {
+    if (readOnly) return; // ✅ nici să nu poți trimite comanda
     try {
       if (!userId || !reservationId || Object.keys(cart).length === 0) {
         Alert.alert("Missing data", "Make sure you selected products and are logged in.");
@@ -91,36 +91,50 @@ const MenuScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+      {readOnly && (
+        <Text style={styles.readOnlyBanner}>Acesta este doar un preview al meniului</Text>
+      )}
+
       {Object.keys(grouped).map(category => (
         <View key={category} style={styles.section}>
           <Text style={styles.sectionTitle}>{category}</Text>
           {grouped[category].map(product => (
             <View key={product.id} style={styles.item}>
               <View style={styles.itemInfo}>
-                <Text style={styles.name}>{product.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Text style={styles.name}>{product.name}</Text>
+                  {product.createdAt && new Date() - new Date(product.createdAt) < 2 * 24 * 60 * 60 * 1000 && (
+                    <Text style={styles.newTag}>NEW</Text>
+                  )}
+                </View>
                 <Text style={styles.desc}>{product.description}</Text>
                 <Text style={styles.price}>{product.price} lei</Text>
               </View>
-              <View style={styles.actions}>
-                <TouchableOpacity onPress={() => removeFromCart(product)} style={styles.actionButton}>
-                  <Text style={styles.actionText}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.quantity}>{cart[product.id]?.quantity || 0}</Text>
-                <TouchableOpacity onPress={() => addToCart(product)} style={styles.actionButton}>
-                  <Text style={styles.actionText}>+</Text>
-                </TouchableOpacity>
-              </View>
+
+              {!readOnly && (
+                <View style={styles.actions}>
+                  <TouchableOpacity onPress={() => removeFromCart(product)} style={styles.actionButton}>
+                    <Text style={styles.actionText}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.quantity}>{cart[product.id]?.quantity || 0}</Text>
+                  <TouchableOpacity onPress={() => addToCart(product)} style={styles.actionButton}>
+                    <Text style={styles.actionText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))}
         </View>
       ))}
 
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Your total: {total} lei</Text>
-        <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
-          <Text style={styles.placeOrderText}>Place Order</Text>
-        </TouchableOpacity>
-      </View>
+      {!readOnly && (
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Your total: {total} lei</Text>
+          <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
+            <Text style={styles.placeOrderText}>Place Order</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -137,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     marginBottom: 12,
-    marginTop: 50
+    marginTop: 50,
   },
   item: {
     marginBottom: 16,
@@ -202,6 +216,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  newTag: {
+    backgroundColor: 'red',
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginLeft: 6,
+  },
+  readOnlyBanner: {
+    textAlign: 'center',
+    color: '#888',
+    fontStyle: 'italic',
+    marginBottom: 16,
+    fontSize: 14,
   },
 });
 

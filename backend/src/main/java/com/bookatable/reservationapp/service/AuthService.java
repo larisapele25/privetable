@@ -3,6 +3,9 @@ package com.bookatable.reservationapp.service;
 import com.bookatable.reservationapp.dto.*;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.repository.UserRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,10 +17,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 
 @Service
@@ -30,6 +35,7 @@ public class AuthService {
 
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
         return email != null && email.matches(emailRegex);
@@ -76,6 +82,7 @@ public class AuthService {
         userRepository.save(user);
         return "User registered successfully";
     }
+
     public User login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Email sau parolă greșite"));
@@ -86,8 +93,6 @@ public class AuthService {
 
         return user;
     }
-
-
 
 
     public void sendResetCode(ForgotPasswordRequest request) {
@@ -108,6 +113,7 @@ public class AuthService {
         // trimite email
         emailService.sendResetCodeEmail(user.getEmail(), resetCode);
     }
+
     public void resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findByResetCode(request.getCode())
                 .orElseThrow(() -> new RuntimeException("Codul de resetare este invalid."));
@@ -116,7 +122,6 @@ public class AuthService {
         if (timestamp == null || timestamp.isBefore(LocalDateTime.now().minusMinutes(15))) {
             throw new RuntimeException("Codul de resetare a expirat.");
         }
-
 
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
@@ -147,6 +152,20 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public boolean checkPassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    public User findOrCreateFirebaseUser(String email, String name) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User user = new User();
+            user.setEmail(email);
+            user.setFirstName(name);
+            user.setProvider("FIREBASE");
+            return userRepository.save(user);
+        });
     }
 
 }

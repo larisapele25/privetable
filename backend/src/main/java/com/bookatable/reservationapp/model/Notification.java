@@ -25,6 +25,7 @@ public class Notification {
 
     private Long verificationId;
 
+    private Long restaurantId;
     @ManyToOne
     @JsonIgnoreProperties({"verifications", "notifications", "password", "resetCode", "resetCodeTimestamp"})
     private User recipient;
@@ -84,4 +85,11 @@ public class Notification {
         this.verificationId = verificationId;
     }
 
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
+    }
 }

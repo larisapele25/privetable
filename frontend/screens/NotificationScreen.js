@@ -4,18 +4,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '../services/api';
 import { format, parseISO } from 'date-fns';
 import { FavoriteContext } from '../context/FavoriteContext';
+import { useNavigation } from '@react-navigation/native';
 
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [acceptedReservationIds, setAcceptedReservationIds] = useState([]);
   const [verificationStatuses, setVerificationStatuses] = useState({});
   const { userId } = useContext(FavoriteContext);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
       const finalUserId = userId || storedUserId;
-
       if (!finalUserId) return;
 
       try {
@@ -36,7 +37,6 @@ const NotificationsScreen = () => {
 
         setNotifications(filtered);
 
-        // Obține statusul pentru fiecare verificare
         const verifStatuses = {};
         for (let n of filtered) {
           if (n.type === 'VERIFICATION' && n.verificationId) {
@@ -77,32 +77,52 @@ const NotificationsScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    
-  
-    <View style={styles.card}>
-      <Text style={styles.message}>{item.message}</Text>
-      <Text style={styles.timestamp}>{format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}</Text>
-      {item.type === 'INVITE' && item.reservationId && (
-        !acceptedReservationIds.includes(item.reservationId) ? (
+  const renderItem = ({ item }) => {
+    const handlePress = () => {
+      if (item.type === 'MENU_UPDATE' && item.restaurantId) {
+        navigation.navigate('MenuScreen', {
+        restaurantId: item.restaurantId,
+        readOnly: true  
+});
+
+      }
+    };
+
+    return (
+      <View style={styles.card}>
+        <Text style={styles.message}>{item.message}</Text>
+        <Text style={styles.timestamp}>
+          {format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}
+        </Text>
+
+        {item.type === 'MENU_UPDATE' && item.restaurantId && (
+          <TouchableOpacity style={styles.menuButton} onPress={handlePress}>
+            <Text style={styles.menuButtonText}>View Menu</Text>
+          </TouchableOpacity>
+        )}
+
+        {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
           <TouchableOpacity
             style={styles.acceptButton}
             onPress={() => handleAccept(item.reservationId)}
           >
             <Text style={styles.acceptText}>Accept</Text>
           </TouchableOpacity>
-        ) : (
-          <Text style={styles.acceptedText}>Deja ai acceptat</Text>
-        )
-      )}
+        )}
 
-      {item.type === 'VERIFICATION' && item.verificationId && (
-        <Text style={styles.statusText}>
-          Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
-        </Text>
-      )}
-    </View>
-  )
+        {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
+          <Text style={styles.acceptedText}>Deja ai acceptat</Text>
+        )}
+
+        {item.type === 'VERIFICATION' && item.verificationId && (
+          <Text style={styles.statusText}>
+            Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+          </Text>
+        )}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>NOTIFICĂRI</Text>
@@ -128,11 +148,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   message: { fontSize: 16, fontWeight: '500' },
   timestamp: { fontSize: 12, color: '#888', marginTop: 6 },
   empty: { textAlign: 'center', color: '#888', marginTop: 50 },
+  menuButton: {
+    marginTop: 10,
+    backgroundColor: 'black',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  menuButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
   acceptButton: {
     backgroundColor: 'black',
     paddingVertical: 10,
@@ -156,7 +189,7 @@ const styles = StyleSheet.create({
     color: 'green',
     fontStyle: 'italic',
     fontSize: 14,
-  }
+  },
 });
 
 export default NotificationsScreen;

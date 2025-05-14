@@ -109,7 +109,7 @@ await API.put('/users/change-password', {
 </View>
 
 
-      {/* ✅ Password rule message */}
+      {/* Password rule message */}
       {newPassword.length > 0 && (
         <Text style={[styles.passwordHint, { color: passwordValid ? 'green' : 'crimson' }]}>
           Your new password must contain at least 8 characters, one uppercase

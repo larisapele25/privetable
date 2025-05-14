@@ -34,6 +34,9 @@ public class User {
 
     @Column(name = "is_verified")
     private boolean verified = false;
+
+    private String provider; // ex: GOOGLE
+
     public User() {
     }
 
@@ -50,6 +53,14 @@ public class User {
     public String getLastName() { return lastName; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
     // Setters
     public void setId(Long id) { this.id = id; }

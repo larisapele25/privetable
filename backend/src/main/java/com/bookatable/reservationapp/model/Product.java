@@ -2,6 +2,8 @@ package com.bookatable.reservationapp.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Product {
     @Id
@@ -12,6 +14,9 @@ public class Product {
     private String description;
     private Double price;
     private String category;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
@@ -45,7 +50,8 @@ public class Product {
     public void setCategory(String category) {this.category = category;}
     public Restaurant getRestaurant() {return restaurant;}
     public void setRestaurant(Restaurant restaurant) {this.restaurant = restaurant;}
-
+    public LocalDateTime getCreatedAt() {return createdAt;}
+    public void setCreatedAt(LocalDateTime createdAt) {this.createdAt = createdAt;}
 }
 
 

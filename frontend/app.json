@@ -2,6 +2,8 @@
   "expo": {
     "name": "PrivéTable",
     "slug": "bookapp",
+    "owner": "larisapele",
+    "scheme": "privetable", 
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/image.png",
@@ -13,7 +15,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.larisapele.bookapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,6 +26,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }

@@ -82,5 +82,12 @@ public class NotificationController {
         return ResponseEntity.ok("Notificările expirate sau acceptate au fost șterse");
     }
 
+    @GetMapping("/menu-updates/{userId}")
+    public List<Notification> getMenuUpdateNotifications(@PathVariable Long userId) {
+        return notificationRepository.findByRecipientId(userId).stream()
+                .filter(n -> "MENU_UPDATE".equals(n.getType()))
+                .toList();
+    }
+
 
 }
