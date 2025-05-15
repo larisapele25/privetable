@@ -5,6 +5,7 @@ import { API } from '../services/api';
 import { format, parseISO } from 'date-fns';
 import { FavoriteContext } from '../context/FavoriteContext';
 import { useNavigation } from '@react-navigation/native';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -23,17 +24,28 @@ const NotificationsScreen = () => {
         await API.delete(`/notifications/cleanup/${finalUserId}`);
         await API.put(`/notifications/mark-as-read/${finalUserId}`);
 
-        const notiRes = await API.get(`/notifications/${finalUserId}`);
-        const allNotifications = Array.isArray(notiRes.data) ? notiRes.data : [];
+        const [notiRes, reservationsRes] = await Promise.all([
+          API.get(`/notifications/${finalUserId}`),
+          API.get(`/reservations/upcoming?userId=${finalUserId}`)
+        ]);
 
-        const reservationsRes = await API.get(`/reservations/upcoming?userId=${finalUserId}`);
+        const allNotifications = Array.isArray(notiRes.data) ? notiRes.data : [];
         const joinedReservationIds = Array.isArray(reservationsRes.data)
           ? reservationsRes.data.map(r => r.id)
           : [];
 
-        const filtered = allNotifications.filter(n =>
-          !(n.type === "INVITE" && joinedReservationIds.includes(n.reservationId))
-        );
+        const now = new Date();
+
+        const filtered = allNotifications.filter(n => {
+          if (n.type === "INVITE") {
+            const isAccepted = joinedReservationIds.includes(n.reservationId);
+            const reservation = reservationsRes.data.find(r => r.id === n.reservationId);
+            if (isAccepted) return true;
+            if (!reservation) return false;
+            return new Date(reservation.dateTime) > now;
+          }
+          return true;
+        });
 
         setNotifications(filtered);
 
@@ -77,49 +89,68 @@ const NotificationsScreen = () => {
     }
   };
 
+  const handleDeleteNotification = (notificationId) => {
+  setNotifications(prev => prev.filter(n => n.id !== notificationId));
+};
+
+
+  const renderRightActions = (item) => (
+    <TouchableOpacity
+      onPress={() => handleDeleteNotification(item.id)}
+      style={styles.deleteButton}
+    >
+      <Text style={styles.deleteText}>Șterge</Text>
+    </TouchableOpacity>
+  );
+
   const renderItem = ({ item }) => {
     const handlePress = () => {
-      if (item.type === 'MENU_UPDATE' && item.restaurantId) {
+      if ((item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId) {
         navigation.navigate('MenuScreen', {
-        restaurantId: item.restaurantId,
-        readOnly: true  
-});
-
+          restaurantId: item.restaurantId,
+          readOnly: true
+        });
       }
     };
 
     return (
-      <View style={styles.card}>
-        <Text style={styles.message}>{item.message}</Text>
-        <Text style={styles.timestamp}>
-          {format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}
-        </Text>
-
-        {item.type === 'MENU_UPDATE' && item.restaurantId && (
-          <TouchableOpacity style={styles.menuButton} onPress={handlePress}>
-            <Text style={styles.menuButtonText}>View Menu</Text>
-          </TouchableOpacity>
-        )}
-
-        {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={() => handleAccept(item.reservationId)}
-          >
-            <Text style={styles.acceptText}>Accept</Text>
-          </TouchableOpacity>
-        )}
-
-        {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
-          <Text style={styles.acceptedText}>Deja ai acceptat</Text>
-        )}
-
-        {item.type === 'VERIFICATION' && item.verificationId && (
-          <Text style={styles.statusText}>
-            Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+      <Swipeable renderRightActions={() => renderRightActions(item)}>
+        <View style={styles.card}>
+          <Text style={styles.message}>{item.message}</Text>
+          <Text style={styles.timestamp}>
+            {format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}
           </Text>
-        )}
-      </View>
+
+          {item.type === 'REENGAGEMENT' && (
+            <Text style={styles.reengageTag}>🍽 Recomandare pentru tine</Text>
+          )}
+
+          {(item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId && (
+            <TouchableOpacity style={styles.menuButton} onPress={handlePress}>
+              <Text style={styles.menuButtonText}>Vezi meniul</Text>
+            </TouchableOpacity>
+          )}
+
+          {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={() => handleAccept(item.reservationId)}
+            >
+              <Text style={styles.acceptText}>Accept</Text>
+            </TouchableOpacity>
+          )}
+
+          {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
+            <Text style={styles.acceptedText}>Deja ai acceptat</Text>
+          )}
+
+          {item.type === 'VERIFICATION' && item.verificationId && (
+            <Text style={styles.statusText}>
+              Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+            </Text>
+          )}
+        </View>
+      </Swipeable>
     );
   };
 
@@ -189,6 +220,23 @@ const styles = StyleSheet.create({
     color: 'green',
     fontStyle: 'italic',
     fontSize: 14,
+  },
+  reengageTag: {
+    color: '#b86b00',
+    fontSize: 13,
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    padding: 20,
+    borderRadius: 12,
+  },
+  deleteText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
