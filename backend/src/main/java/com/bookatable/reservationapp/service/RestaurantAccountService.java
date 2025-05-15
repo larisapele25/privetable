@@ -1,10 +1,14 @@
 package com.bookatable.reservationapp.service;
+
 import com.bookatable.reservationapp.model.Restaurant;
 import com.bookatable.reservationapp.model.RestaurantAccount;
 import com.bookatable.reservationapp.repository.RestaurantAccountRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -31,7 +35,7 @@ public class RestaurantAccountService {
 
         restaurantAccountRepository.save(account);
 
-        // Trimite parola manual prin telefon/SMS
+        // Parola afișată în consolă — doar pentru dezvoltare/demo
         System.out.println("Login code: " + loginCode + " | Password: " + rawPassword);
 
         return account;
@@ -43,6 +47,15 @@ public class RestaurantAccountService {
     }
 
     private String generateRandomPassword() {
-        return org.apache.commons.lang3.RandomStringUtils.random(8, true, true);
+        return RandomStringUtils.random(8, true, true);
+    }
+
+    public List<Map<String, String>> getAllWithLoginCodes() {
+        return restaurantAccountRepository.findAll().stream()
+                .map(acc -> Map.of(
+                        "name", acc.getRestaurant().getName(),
+                        "loginCode", acc.getLoginCode()
+                ))
+                .toList();
     }
 }

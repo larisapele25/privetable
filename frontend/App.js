@@ -14,6 +14,10 @@ import VerificationScreen from './screens/VerificationScreen';
 import RestaurantLoginScreen from './screens/RestaurantLoginScreen';
 import RestaurantDashboard from './screens/RestaurantDashboard';
 import ProductManagerScreen from './screens/ProductManagerScreen';
+import AdminLoginScreen from './screens/AdminLoginScreen';
+import AdminPanelScreen from './screens/AdminPanelScreen';
+import AddRestaurantScreen from './screens/AddRestaurantScreen';
+import AdminRestaurantListScreen from './screens/AdminRestaurantListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +35,10 @@ export default function App() {
             <Stack.Screen name="RestaurantLogin" component={RestaurantLoginScreen} />
             <Stack.Screen name="RestaurantDashboard" component={RestaurantDashboard} />
             <Stack.Screen name="ProductManager" component={ProductManagerScreen} />
+            <Stack.Screen name="AdminLogin" component={AdminLoginScreen} />
+            <Stack.Screen name="AdminPanel" component={AdminPanelScreen} />
+            <Stack.Screen name="AddRestaurant" component={AddRestaurantScreen} />
+            <Stack.Screen name="AdminRestaurantList" component={AdminRestaurantListScreen} />
 
             <Stack.Screen
               name="ForgotPassword"

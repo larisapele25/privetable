@@ -1,26 +1,18 @@
-package com.bookatable.reservationapp.model;
+package com.bookatable.reservationapp.dto;
 
-import jakarta.persistence.*;
+public class RestaurantInfoDTO {
 
-@Entity
-@Table(name = "restaurants")
-public class Restaurant {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     private String imageUrl;
-
+    private String loginCode;
     private int capacity;
 
-    public Restaurant() {}
-
-    public Restaurant(String name, String imageUrl, int capacity) {
+    public RestaurantInfoDTO(Long id, int capacity, String name, String imageUrl, String loginCode) {
+        this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.loginCode = loginCode;
         this.capacity = capacity;
     }
 
@@ -36,20 +28,23 @@ public class Restaurant {
         return imageUrl;
     }
 
+    public String getLoginCode() {
+        return loginCode;
+    }
+    public int getCapacity() {
+        return capacity;
+    }
     public void setId(Long id) {
         this.id = id;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
-    public int getCapacity() {
-        return capacity;
+    public void setLoginCode(String loginCode) {
+        this.loginCode = loginCode;
     }
     public void setCapacity(int capacity) {
         this.capacity = capacity;

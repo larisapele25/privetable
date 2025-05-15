@@ -18,6 +18,18 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { setUserId } = useContext(FavoriteContext);
+  const [tapCount, setTapCount] = useState(0); // 👈 pentru gestul secret
+
+  const handleLogoPress = () => {
+    const newCount = tapCount + 1;
+    if (newCount >= 5) {
+      setTapCount(0);
+      navigation.navigate('AdminLogin'); // 👈 asigură-te că ai această rută
+    } else {
+      setTapCount(newCount);
+      setTimeout(() => setTapCount(0), 2000); // reset dacă nu atinge rapid
+    }
+  };
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -31,39 +43,15 @@ export default function LoginScreen({ navigation }) {
       });
 
       const { userId } = res.data;
-
-      if (!userId) {
-        throw new Error('ID-ul utilizatorului nu a fost returnat.');
-      }
-      
       await AsyncStorage.setItem('userId', userId.toString());
       setUserId(userId);
-      console.log("User:",userId);
 
-      Alert.alert('Autentificare reușită');
       navigation.reset({
         index: 0,
-        routes: [
-          {
-            name: 'MainTabs',
-            state: {
-              routes: [
-                {
-                  name: 'HomeTab',
-                  state: {
-                    routes: [{ name: 'HomeMain' }],
-                  },
-                },
-              ],
-            },
-          },
-        ],
+        routes: [{ name: 'MainTabs' }],
       });
-      
-      
-      
+
     } catch (err) {
-      console.log('Eroare login:', err.response?.data || err.message);
       const errorMsg =
         err.response?.data?.message || 'Email sau parolă greșite';
       Alert.alert('Eroare', errorMsg);
@@ -72,10 +60,13 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/images/image.png')}
-        style={styles.logo}
-      />
+      {/* 👇 LOGO SECRET TOUCH */}
+      <TouchableOpacity onPress={handleLogoPress}>
+        <Image
+          source={require('../assets/images/image.png')}
+          style={styles.logo}
+        />
+      </TouchableOpacity>
 
       <TextInput
         placeholder="Email"
@@ -117,21 +108,16 @@ export default function LoginScreen({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.link}>Don't have an account?</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('RestaurantLogin')}>
-  <Text style={styles.link}>Login ca restaurant</Text>
-</TouchableOpacity>
 
+      <TouchableOpacity onPress={() => navigation.navigate('RestaurantLogin')}>
+        <Text style={styles.link}>Login ca restaurant</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 40,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, justifyContent: 'center', padding: 40, backgroundColor: '#fff' },
   logo: {
     width: 220,
     height: 220,
@@ -139,13 +125,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: -10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#aaa',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
+  input: { borderWidth: 1, borderColor: '#aaa', borderRadius: 8, padding: 12, marginBottom: 16 },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -155,27 +135,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingRight: 12,
   },
-  passwordInput: {
-    flex: 1,
-    padding: 12,
-  },
-  icon: {
-    padding: 4,
-  },
-  button: {
-    backgroundColor: '#000',
-    padding: 14,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  link: {
-    color: '#000',
-    textAlign: 'center',
-    marginTop: 8,
-  },
+  passwordInput: { flex: 1, padding: 12 },
+  icon: { padding: 4 },
+  button: { backgroundColor: '#000', padding: 14, borderRadius: 8, marginBottom: 12 },
+  buttonText: { color: '#fff', textAlign: 'center', fontWeight: '600' },
+  link: { color: '#000', textAlign: 'center', marginTop: 8 },
 });

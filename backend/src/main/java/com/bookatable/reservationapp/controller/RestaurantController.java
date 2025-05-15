@@ -9,7 +9,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,9 +41,13 @@ public class RestaurantController {
     }
 
     @GetMapping("/all")
-    public List<Restaurant> getAllRestaurants() {
+    public List<Restaurant> getAllRestaurants(@RequestHeader("X-ADMIN-CODE") String adminCode) {
+        if (!adminCode.equals("qPL82fWdX9kRuM7CZtAjvENoB63yhs0K")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acces interzis");
+        }
         return restaurantRepository.findAll();
     }
+
 
     public record RestaurantDTO(Long id, String name, String imageUrl) {
         public static RestaurantDTO from(Restaurant r) {
