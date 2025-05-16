@@ -8,48 +8,68 @@ export const FavoriteProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [userId, setUserId] = useState(null);
 
+  // Se apelează automat la pornirea aplicației
   useEffect(() => {
-    const init = async () => {
-      const id = await AsyncStorage.getItem('userId');
-      console.log('loaded userId from AsyncStorage:', id);
-
-      if (id) {
-        try {
-          const userRes = await API.get(`/users/${id}`);
-          console.log('✅ User logat:', userRes.data);
-          setUserId(id);
-
-          const favRes = await API.get(`/users/${id}/favorites`);
-          setFavorites(favRes.data.map((r) => r.id));
-        } catch (err) {
-          console.warn('⚠️ User invalid. Șterg userId din AsyncStorage.');
-          await AsyncStorage.removeItem('userId');
-          setUserId(null);
-          setFavorites([]);
-        }
-      } else {
-        console.log('🟡 Niciun user salvat în AsyncStorage.');
-      }
-    };
-
-    init();
+    autoLoginAndLoadFavorites();
   }, []);
 
+  // Autentifică automat dacă există userId salvat
+  const autoLoginAndLoadFavorites = async () => {
+    try {
+      const storedId = await AsyncStorage.getItem('userId');
+      if (!storedId) return;
+
+      const userRes = await API.get(`/users/${storedId}`);
+      console.log('✅ Utilizator găsit:', userRes.data);
+      setUserId(storedId);
+
+      await loadFavorites(storedId);
+    } catch (error) {
+      console.warn('❌ Autentificare eșuată:', error.message);
+      await AsyncStorage.removeItem('userId');
+      setUserId(null);
+      setFavorites([]);
+    }
+  };
+
+  // Încarcă favoritele de pe backend
+  const loadFavorites = async (id) => {
+    try {
+      const favRes = await API.get(`/users/${id}/favorites`);
+      const favoriteIds = favRes.data.map((r) => r.id);
+      setFavorites(favoriteIds);
+    } catch (error) {
+      console.error('❌ Eroare la încărcarea favoriteleor:', error.message);
+      setFavorites([]);
+    }
+  };
+
+  // Adaugă un restaurant la favorite
   const addFavorite = async (restaurantId) => {
-    await API.post(`/users/${userId}/favorites/${restaurantId}`);
-    setFavorites((prev) => [...prev, restaurantId]);
+    try {
+      await API.post(`/users/${userId}/favorites/${restaurantId}`);
+      setFavorites((prev) => [...prev, restaurantId]);
+    } catch (error) {
+      console.error('❌ Eroare la adăugare favorite:', error.message);
+    }
   };
 
+  // Șterge un restaurant din favorite
   const removeFavorite = async (restaurantId) => {
-    await API.delete(`/users/${userId}/favorites/${restaurantId}`);
-    setFavorites((prev) => prev.filter((id) => id !== restaurantId));
+    try {
+      await API.delete(`/users/${userId}/favorites/${restaurantId}`);
+      setFavorites((prev) => prev.filter((id) => id !== restaurantId));
+    } catch (error) {
+      console.error('❌ Eroare la ștergere favorite:', error.message);
+    }
   };
 
+  // Logout curat
   const logout = async () => {
     await AsyncStorage.removeItem('userId');
     setUserId(null);
     setFavorites([]);
-    console.log('🚪 Logout complet – userId șters din AsyncStorage');
+    console.log('🚪 Logout – userId și favorite resetate');
   };
 
   return (
@@ -59,8 +79,9 @@ export const FavoriteProvider = ({ children }) => {
         addFavorite,
         removeFavorite,
         userId,
-        logout,
         setUserId,
+        logout,
+        loadFavorites,
       }}
     >
       {children}

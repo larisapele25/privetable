@@ -40,14 +40,18 @@ public class RestaurantController {
                 .collect(java.util.stream.Collectors.toSet());
     }
 
-    @GetMapping("/all")
-    public List<Restaurant> getAllRestaurants(@RequestHeader("X-ADMIN-CODE") String adminCode) {
+    @GetMapping("/all-admin")
+    public List<Restaurant> getAllRestaurantsAdmin(@RequestHeader("X-ADMIN-CODE") String adminCode) {
         if (!adminCode.equals("qPL82fWdX9kRuM7CZtAjvENoB63yhs0K")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acces interzis");
         }
         return restaurantRepository.findAll();
     }
 
+    @GetMapping("/all")
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantRepository.findAll();
+    }
 
     public record RestaurantDTO(Long id, String name, String imageUrl) {
         public static RestaurantDTO from(Restaurant r) {

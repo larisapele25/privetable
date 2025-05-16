@@ -17,17 +17,17 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { setUserId } = useContext(FavoriteContext);
-  const [tapCount, setTapCount] = useState(0); // 👈 pentru gestul secret
+  const { setUserId, loadFavorites } = useContext(FavoriteContext);
+  const [tapCount, setTapCount] = useState(0);
 
   const handleLogoPress = () => {
     const newCount = tapCount + 1;
     if (newCount >= 5) {
       setTapCount(0);
-      navigation.navigate('AdminLogin'); // 👈 asigură-te că ai această rută
+      navigation.navigate('AdminLogin');
     } else {
       setTapCount(newCount);
-      setTimeout(() => setTapCount(0), 2000); // reset dacă nu atinge rapid
+      setTimeout(() => setTapCount(0), 2000);
     }
   };
 
@@ -43,24 +43,28 @@ export default function LoginScreen({ navigation }) {
       });
 
       const { userId } = res.data;
+
+      // 🔑 Salvează și setează userId
       await AsyncStorage.setItem('userId', userId.toString());
       setUserId(userId);
 
+      // 🔁 Încarcă favoritele după login
+      await loadFavorites(userId);
+
+      // 🔁 Navigare în aplicație
       navigation.reset({
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
 
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message || 'Email sau parolă greșite';
+      const errorMsg = err.response?.data?.message || 'Email sau parolă greșite';
       Alert.alert('Eroare', errorMsg);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* 👇 LOGO SECRET TOUCH */}
       <TouchableOpacity onPress={handleLogoPress}>
         <Image
           source={require('../assets/images/image.png')}
@@ -85,15 +89,8 @@ export default function LoginScreen({ navigation }) {
           style={styles.passwordInput}
           secureTextEntry={!showPassword}
         />
-        <TouchableOpacity
-          onPress={() => setShowPassword((prev) => !prev)}
-          style={styles.icon}
-        >
-          <Ionicons
-            name={showPassword ? 'eye' : 'eye-off'}
-            size={22}
-            color="#333"
-          />
+        <TouchableOpacity onPress={() => setShowPassword((prev) => !prev)} style={styles.icon}>
+          <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
 
