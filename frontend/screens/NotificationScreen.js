@@ -11,9 +11,22 @@ const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [acceptedReservationIds, setAcceptedReservationIds] = useState([]);
   const [verificationStatuses, setVerificationStatuses] = useState({});
+  const [hiddenNotificationIds, setHiddenNotificationIds] = useState([]);
   const { userId } = useContext(FavoriteContext);
   const navigation = useNavigation();
 
+  // 🔁 Încarcă notificările ascunse
+  useEffect(() => {
+    const loadHidden = async () => {
+      const stored = await AsyncStorage.getItem('hiddenNotificationIds');
+      if (stored) {
+        setHiddenNotificationIds(JSON.parse(stored));
+      }
+    };
+    loadHidden();
+  }, []);
+
+  // 🔁 Fetch notificări
   useEffect(() => {
     const fetchNotifications = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
@@ -34,23 +47,10 @@ const NotificationsScreen = () => {
           ? reservationsRes.data.map(r => r.id)
           : [];
 
-        const now = new Date();
-
-        const filtered = allNotifications.filter(n => {
-          if (n.type === "INVITE") {
-            const isAccepted = joinedReservationIds.includes(n.reservationId);
-            const reservation = reservationsRes.data.find(r => r.id === n.reservationId);
-            if (isAccepted) return true;
-            if (!reservation) return false;
-            return new Date(reservation.dateTime) > now;
-          }
-          return true;
-        });
-
-        setNotifications(filtered);
+        setNotifications(allNotifications);
 
         const verifStatuses = {};
-        for (let n of filtered) {
+        for (let n of allNotifications) {
           if (n.type === 'VERIFICATION' && n.verificationId) {
             try {
               const res = await API.get(`/verify/status/${n.verificationId}`);
@@ -69,6 +69,7 @@ const NotificationsScreen = () => {
     fetchNotifications();
   }, [userId]);
 
+  // ✅ Accept rezervare și refetch + cleanup
   const handleAccept = async (reservationId) => {
     try {
       const finalUserId = userId || (await AsyncStorage.getItem('userId'));
@@ -82,17 +83,26 @@ const NotificationsScreen = () => {
       });
 
       Alert.alert('Succes', 'Ai intrat în rezervare.');
-      setAcceptedReservationIds(prev => [...prev, reservationId]);
+
+      await API.delete(`/notifications/cleanup/${finalUserId}`);
+      const refreshed = await API.get(`/notifications/${finalUserId}`);
+      setNotifications(refreshed.data);
     } catch (err) {
       console.error('Join error:', err);
       Alert.alert('Eroare', 'Rezervarea nu a putut fi acceptată.');
     }
   };
 
-  const handleDeleteNotification = (notificationId) => {
-  setNotifications(prev => prev.filter(n => n.id !== notificationId));
-};
-
+  // ✅ Ascunde notificare doar local + persistă
+  const handleDeleteNotification = async (notificationId) => {
+    try {
+      const updatedHidden = [...hiddenNotificationIds, notificationId];
+      setHiddenNotificationIds(updatedHidden);
+      await AsyncStorage.setItem('hiddenNotificationIds', JSON.stringify(updatedHidden));
+    } catch (e) {
+      console.error('Eroare la salvarea notificărilor ascunse:', e);
+    }
+  };
 
   const renderRightActions = (item) => (
     <TouchableOpacity
@@ -157,11 +167,11 @@ const NotificationsScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>NOTIFICĂRI</Text>
-      {notifications.length === 0 ? (
+      {notifications.filter(n => !hiddenNotificationIds.includes(n.id)).length === 0 ? (
         <Text style={styles.empty}>Nu ai notificări.</Text>
       ) : (
         <FlatList
-          data={notifications}
+          data={notifications.filter(n => !hiddenNotificationIds.includes(n.id))}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
         />

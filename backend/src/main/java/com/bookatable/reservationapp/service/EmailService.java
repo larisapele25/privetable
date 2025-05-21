@@ -26,7 +26,7 @@ public class EmailService {
         System.out.println("🔔 Trimit reminder către: " + to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Reminder rezervare - BookApp");
+        message.setSubject("Reminder rezervare - PrivéTable");
         message.setText(
                 "Hei " + name + ",\n\n" +
                         "Ai o rezervare la restaurantul " + restaurant + " azi la ora " + time + ".\n" +

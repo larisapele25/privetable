@@ -1,6 +1,7 @@
 package com.bookatable.reservationapp.service;
 import com.bookatable.reservationapp.model.Notification;
 import com.bookatable.reservationapp.model.Product;
+import com.bookatable.reservationapp.model.Restaurant;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.repository.NotificationRepository;
 import com.bookatable.reservationapp.repository.ProductRepository;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -32,38 +34,41 @@ public class NotificationService {
         this.productRepository = productRepository;
     }
 
-    @Scheduled(cron = "0 0 15 * * *")
-public void sendReengagementNotifications() {
-    System.out.println("⏰ Jobul de reengagement rulează");
+    @Scheduled(cron = "0 0 15 */3 * *") // Rulează la ora 15:00 o dată la 3 zile
+    public void sendReengagementNotifications() {
+        System.out.println("⏰ Jobul de reengagement rulează");
 
-    List<User> users = userRepository.findAll();
-    int count = 0;
+        List<User> users = userRepository.findAll();
+        int count = 0;
 
-    for (User user : users) {
-        List<Notification> recent = notificationRepository.findByRecipientId(user.getId()).stream()
-                .filter(n -> n.getTimestamp().isAfter(LocalDateTime.now().minusDays(7)))
-                .toList();
+        for (User user : users) {
+            // Nu trimitem notificare dacă userul a primit deja una în ultimele 2 zile
+            List<Notification> recent = notificationRepository.findByRecipientId(user.getId()).stream()
+                    .filter(n -> n.getTimestamp().isAfter(LocalDateTime.now().minusDays(2)))
+                    .toList();
 
-        Optional<Product> randomProduct = productRepository.findAll().stream().findAny();
-        if (randomProduct.isEmpty()) continue;
+            boolean alreadySent = recent.stream().anyMatch(n -> "REENGAGEMENT".equals(n.getType()));
+            if (alreadySent) continue;
 
-        Product product = randomProduct.get();
-        String message = "🍽 Hei! N-ai mai încercat demult " +
-                product.getName() + " de la " + product.getRestaurant().getName() + ". Poate revii?";
+            if (!user.getFavoriteRestaurants().isEmpty()) {
+                List<Restaurant> favoriteList = new ArrayList<>(user.getFavoriteRestaurants());
+                Restaurant restaurant = favoriteList.get(new Random().nextInt(favoriteList.size()));
 
-        Notification notif = new Notification();
-        notif.setMessage(message);
-        notif.setType("REENGAGEMENT");
-        notif.setTimestamp(LocalDateTime.now());
-        notif.setRecipient(user);
-        notif.setRestaurantId(product.getRestaurant().getId());
+                String message = "🍽 Revino la " + restaurant.getName() +
+                        " – meniul tău preferat te așteaptă!";
 
-        notificationRepository.save(notif);
-        count++;
+                Notification notif = new Notification();
+                notif.setMessage(message);
+                notif.setType("REENGAGEMENT");
+                notif.setTimestamp(LocalDateTime.now());
+                notif.setRecipient(user);
+                notif.setRestaurantId(restaurant.getId());
+
+                notificationRepository.save(notif);
+                count++;
+                continue;
+            }
+
+        }
     }
-
-    System.out.println("✅ Notificări REENGAGEMENT salvate: " + count);
 }
-
-}
-

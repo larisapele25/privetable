@@ -43,6 +43,13 @@ export default function AdminLoginScreen() {
       <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
         <Text style={styles.buttonText}>CONTINUE</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+  onPress={() => navigation.navigate('Login')}
+  style={styles.backButton}
+>
+  <Text style={styles.backButtonText}>← Înapoi la login</Text>
+</TouchableOpacity>
+
     </View>
   );
 }
@@ -59,5 +66,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff', textAlign: 'center', fontWeight: '600'
-  }
+  },
+  backButton: {
+  marginTop: 20,
+  alignSelf: 'center',
+},
+backButtonText: {
+  color: '#555',
+  fontSize: 16,
+
+}
+
 });

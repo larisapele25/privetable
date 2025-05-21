@@ -70,8 +70,12 @@ public class NotificationController {
                 if (res == null) continue;
 
                 boolean isPast = res.getDateTime().isBefore(java.time.LocalDateTime.now());
-                boolean hasJoined = res.getParticipants().contains(user);
 
+                // ✅ comparație sigură: pe baza ID-ului, nu pe obiect
+                boolean hasJoined = res.getParticipants().stream()
+                        .anyMatch(p -> p.getId().equals(user.getId()));
+
+                // 🔥 Șterge notificarea dacă e în trecut SAU userul a acceptat deja
                 if (isPast || hasJoined) {
                     toDelete.add(n);
                 }
@@ -79,8 +83,10 @@ public class NotificationController {
         }
 
         notificationRepository.deleteAll(toDelete);
-        return ResponseEntity.ok("Notificările expirate sau acceptate au fost șterse");
+        return ResponseEntity.ok("Notificările expirate sau acceptate au fost șterse.");
     }
+
+
 
     @GetMapping("/menu-updates/{userId}")
     public List<Notification> getMenuUpdateNotifications(@PathVariable Long userId) {
