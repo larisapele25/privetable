@@ -153,15 +153,28 @@ public class VerificationController {
         return verificationRepository.findById(id)
                 .map(verification -> {
                     Map<String, Object> response = new HashMap<>();
-                    response.put("status", verification.isVerificationStatus() ? "APPROVED" : "PENDING");
+
+                    if (verification.isReviewedByAdmin()) {
+                        // dacă a fost aprobat
+                        if (verification.isVerificationStatus()) {
+                            response.put("status", "APPROVED");
+                        } else {
+                            response.put("status", "REJECTED"); // dacă a fost respins
+                        }
+                    } else {
+                        response.put("status", "PENDING"); // încă neprocesat
+                    }
+
                     response.put("reviewed", verification.isReviewedByAdmin());
-                    response.put("comment", verification.getAdminComment()); // poate fi null, e OK
+                    response.put("comment", verification.getAdminComment());
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                         Map.of("error", "Verificarea nu a fost găsită")
                 ));
     }
+
+
 
 
 

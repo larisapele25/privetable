@@ -18,6 +18,7 @@ import AdminLoginScreen from './screens/AdminLoginScreen';
 import AdminPanelScreen from './screens/AdminPanelScreen';
 import AddRestaurantScreen from './screens/AddRestaurantScreen';
 import AdminRestaurantListScreen from './screens/AdminRestaurantListScreen';
+import VerificationAdminScreen from './screens/VerificationAdminScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,7 @@ export default function App() {
             <Stack.Screen name="AdminPanel" component={AdminPanelScreen} />
             <Stack.Screen name="AddRestaurant" component={AddRestaurantScreen} />
             <Stack.Screen name="AdminRestaurantList" component={AdminRestaurantListScreen} />
+            <Stack.Screen name="VerificationAdmin" component={VerificationAdminScreen} />
 
             <Stack.Screen
               name="ForgotPassword"

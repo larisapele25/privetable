@@ -88,7 +88,7 @@ const VerificationScreen = ({ navigation }) => {
     });
 
     try {
-      const response = await fetch("http://192.168.0.234:8080/verify/submit", {
+      const response = await fetch("http://192.168.0.234:8080/api/verify/submit", {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -117,25 +117,25 @@ const VerificationScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.header}>Verificare identitate</Text>
+        <Text style={styles.header}>VERIFY ACCOUNT</Text>
 
-        <TextInput style={styles.input} placeholder="Nume" value={name} onChangeText={setName} />
-        <TextInput style={styles.input} placeholder="Prenume" value={surname} onChangeText={setSurname} />
+        <TextInput style={styles.input} placeholder="FirstName" value={name} onChangeText={setName} />
+        <TextInput style={styles.input} placeholder="Surname" value={surname} onChangeText={setSurname} />
         <TextInput style={styles.input} placeholder="CNP" value={cnp} onChangeText={setCnp} keyboardType="numeric" />
-        <TextInput style={styles.input} placeholder="Serie buletin (ex: AB123456)" value={idNumber} onChangeText={setIdNumber} />
+        <TextInput style={styles.input} placeholder="ID Number (ex: AB123456)" value={idNumber} onChangeText={setIdNumber} />
 
         <TouchableOpacity style={styles.button} onPress={() => pickImage('front')}>
-          <Text style={styles.buttonText}>Încarcă fața buletinului</Text>
+          <Text style={styles.buttonText}>Upload front of the identity card</Text>
         </TouchableOpacity>
         {frontImage && <Image source={{ uri: frontImage }} style={styles.imagePreview} />}
 
         <TouchableOpacity style={styles.button} onPress={() => pickImage('back')}>
-          <Text style={styles.buttonText}>Încarcă verso buletinului</Text>
+          <Text style={styles.buttonText}>Upload back of the identity card</Text>
         </TouchableOpacity>
         {backImage && <Image source={{ uri: backImage }} style={styles.imagePreview} />}
 
         <TouchableOpacity style={styles.submitButton} onPress={submitVerification}>
-          <Text style={styles.submitButtonText}>Trimite verificare</Text>
+          <Text style={styles.submitButtonText}>Send</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   wrapper: { flex: 1, backgroundColor: '#f2f2f2' },
   container: { padding: 20, paddingBottom: 40 },
   backButton: { position: 'absolute', top: 10, left: 10, marginTop: 70, zIndex: 1 },
-  header: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 30 },
+  header: { fontSize: 24, fontWeight: '500', textAlign: 'center', marginVertical: 30, marginTop: 100 },
   input: {
     backgroundColor: '#fff', borderWidth: 1, borderColor: '#ccc',
     paddingHorizontal: 10, borderRadius: 8, height: 45, marginBottom: 15

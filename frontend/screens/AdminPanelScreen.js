@@ -41,6 +41,11 @@ export default function AdminPanelScreen() {
         >
           <Text style={styles.buttonText}>📋 Restaurants</Text>
         </TouchableOpacity>
+    <TouchableOpacity
+        style={styles.smallButton}
+        onPress={() => navigation.navigate('VerificationAdmin')}>
+    <Text style={styles.buttonText}>🔍 User Verification</Text>
+    </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.smallButton, styles.logoutButton]}
@@ -48,6 +53,8 @@ export default function AdminPanelScreen() {
         >
           <Text style={styles.buttonText}>🚪 Logout</Text>
         </TouchableOpacity>
+
+     
       </View>
     </SafeAreaView>
   );
@@ -57,7 +64,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center', backgroundColor: '#fff' },
   header: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '400',
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -74,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButton: {
-    backgroundColor: '#000', // roșu închis pentru logout
+    backgroundColor: 'red', 
   },
   buttonText: {
     color: '#fff',

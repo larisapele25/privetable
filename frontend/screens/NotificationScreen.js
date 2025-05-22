@@ -155,10 +155,16 @@ const NotificationsScreen = () => {
           )}
 
           {item.type === 'VERIFICATION' && item.verificationId && (
-            <Text style={styles.statusText}>
-              Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
-            </Text>
-          )}
+  <Text style={[
+    styles.statusText,
+    verificationStatuses[item.verificationId] === 'PENDING' && { color: '#e6b800' }, // galben
+    verificationStatuses[item.verificationId] === 'APPROVED' && { color: 'green' },
+    verificationStatuses[item.verificationId] === 'REJECTED' && { color: 'crimson' },
+  ]}>
+    Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+  </Text>
+)}
+
         </View>
       </Swipeable>
     );

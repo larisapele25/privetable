@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff', flex: 1 },
   backButton: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, marginTop: 70 },
   backText: { marginLeft: 6, fontSize: 16, color: '#000' },
-  title: { fontSize: 20, fontWeight: '600', marginBottom: 16, textAlign: 'center' },
+  title: { fontSize: 24, fontWeight: '400', marginBottom: 16, textAlign: 'center' },
   item: { marginBottom: 14, padding: 10, borderBottomWidth: 1, borderColor: '#ddd' },
   name: { fontSize: 16, fontWeight: '500' },
   code: { fontSize: 14, color: '#555' }

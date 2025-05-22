@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
   backBtn: { marginBottom: 10 ,marginTop: 20, marginLeft: 16 },
   backText: { fontSize: 16, color: '#000' },
   header: {
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '400',
     textAlign: 'center',
     marginBottom: 24,
   },

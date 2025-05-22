@@ -22,7 +22,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogoPress = () => {
     const newCount = tapCount + 1;
-    if (newCount >= 5) {
+    if (newCount >= 1) {
       setTapCount(0);
       navigation.navigate('AdminLogin');
     } else {
