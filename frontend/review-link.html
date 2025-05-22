@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+      const resId = params.get("reservationId");
+      const userId = params.get("userId");
+      const restId = params.get("restaurantId");
+      return `privetable://review?reservationId=${resId}&userId=${userId}&restaurantId=${restId}`;
+    }
+
+    window.onload = function () {
+      const deepLink = getParams();
+      window.location.href = deepLink;
+
+      // fallback dacă nu se deschide aplicația
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <h2>Nu s-a putut deschide aplicația.</h2>
+          <p>Instalează aplicația PrivéTable și încearcă din nou.</p>
+        `;
+      }, 3000);
+    };
+  </script>
+</head>
+<body>
+  <p>Se deschide aplicația PrivéTable...</p>
+</body>
+</html>

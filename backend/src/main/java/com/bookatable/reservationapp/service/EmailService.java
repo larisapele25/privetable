@@ -36,4 +36,30 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    public void sendReviewRequestEmail(String to, String name, String restaurantName, Long reservationId, Long userId, Long restaurantId) {
+        System.out.println("📨 Trimit cerere review către: " + to);
+
+        // Construiește linkul de tip deep link (pentru aplicație mobilă)
+        String reviewLink = "https://larisapele25.github.io/review-link/" +
+                "?reservationId=" + reservationId +
+                "&userId=" + userId +
+                "&restaurantId=" + restaurantId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Cum ți s-a părut experiența ta? ✨");
+        message.setText(
+                "Salut " + name + ",\n\n" +
+                        "Ne bucurăm că ai ales serviciile PrivéTable!\n" +
+                        "Ai avut o rezervare la " + restaurantName + " și ne-ar plăcea să aflăm cum a fost.\n\n" +
+                        "👉 Apasă aici pentru a da un review: " + reviewLink + "\n\n" +
+                        "Poți alege între 1–5 stele și adăuga un comentariu.\n\n" +
+                        "Mulțumim că ești cu noi!\n" +
+                        "Echipa PrivéTable 💜"
+        );
+        mailSender.send(message);
+    }
+
+
+
 }

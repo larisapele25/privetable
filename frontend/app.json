@@ -3,7 +3,7 @@
     "name": "PrivéTable",
     "slug": "bookapp",
     "owner": "larisapele",
-    "scheme": "privetable", 
+    "scheme": "privetable",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/image.png",
@@ -22,13 +22,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "https",
+            "host": "privetable.app",
+            "pathPrefix": "/"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-web-browser"
-    ]
+    "plugins": ["expo-web-browser"]
   }
 }
