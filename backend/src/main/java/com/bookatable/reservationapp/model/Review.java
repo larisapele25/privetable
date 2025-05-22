@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "reservation_id"})
+})
 public class Review {
 
     @Id
@@ -18,16 +20,16 @@ public class Review {
 
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
     public Review() {
@@ -37,6 +39,7 @@ public class Review {
     // Getters & setters
 
     public Long getId() { return id; }
+
     public int getRating() { return rating; }
     public void setRating(int rating) { this.rating = rating; }
 

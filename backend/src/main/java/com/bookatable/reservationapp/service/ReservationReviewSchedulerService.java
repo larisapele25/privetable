@@ -1,14 +1,14 @@
 package com.bookatable.reservationapp.service;
 
+import com.bookatable.reservationapp.model.Notification;
 import com.bookatable.reservationapp.model.Reservation;
 import com.bookatable.reservationapp.model.User;
+import com.bookatable.reservationapp.repository.NotificationRepository;
 import com.bookatable.reservationapp.repository.ReservationRepository;
-import com.bookatable.reservationapp.service.EmailService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.PostConstruct;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,13 +16,17 @@ import java.util.List;
 @Service
 public class ReservationReviewSchedulerService {
 
+
     @Autowired
     private ReservationRepository reservationRepository;
 
     @Autowired
     private EmailService emailService;
 
-    @Scheduled(cron = "0 0 * * * *") // în fiecare oră fix
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Scheduled(cron = "0 */5 * * * *") // la fiecare 8 minute
     @Transactional
     public void sendReviewRequests() {
         LocalDateTime now = LocalDateTime.now();
@@ -32,45 +36,62 @@ public class ReservationReviewSchedulerService {
                 .filter(r -> !Boolean.TRUE.equals(r.isNotified()))
                 .toList();
 
+        int totalSent = 0;
+
         for (Reservation r : pastReservations) {
             Long reservationId = r.getId();
             Long restaurantId = r.getRestaurant().getId();
+            String restaurantName = r.getRestaurant().getName();
 
-            // creatorul rezervării
-            if (r.getUser() != null && r.getUser().getEmail() != null) {
+            // Email + notificare pentru creator
+            User creator = r.getUser();
+            if (creator != null && creator.getEmail() != null) {
                 emailService.sendReviewRequestEmail(
-                        r.getUser().getEmail(),
-                        r.getUser().getFirstName(),
-                        r.getRestaurant().getName(),
-                        reservationId,
-                        r.getUser().getId(),
-                        restaurantId
+                        creator.getEmail(),
+                        creator.getFirstName(),
+                        restaurantName
                 );
+
+                Notification notif = new Notification();
+                notif.setRecipient(creator);
+                notif.setType("REVIEW_REMINDER");
+                notif.setMessage("📝 Ai fost la " + r.getRestaurant().getName() + "? Lasă-ne un review!");
+                notif.setTimestamp(LocalDateTime.now());
+                notif.setReservationId(r.getId()); // <–– important!
+                notif.setRestaurantId(r.getRestaurant().getId());
+                notif.setVerificationId(null);
+                notificationRepository.save(notif);
+                totalSent++;
             }
 
-            // participanții
-            for (User u : r.getParticipants()) {
-                if (u.getEmail() != null) {
+            // Email + notificare pentru participanți
+            for (User participant : r.getParticipants()) {
+                if (participant.getEmail() != null) {
                     emailService.sendReviewRequestEmail(
-                            u.getEmail(),
-                            u.getFirstName(),
-                            r.getRestaurant().getName(),
-                            reservationId,
-                            u.getId(),
-                            restaurantId
+                            participant.getEmail(),
+                            participant.getFirstName(),
+                            restaurantName
                     );
+
+                    Notification notif = new Notification();
+                    notif.setRecipient(participant);
+                    notif.setType("REVIEW_REMINDER");
+                    notif.setMessage("📝 Ai fost la " + r.getRestaurant().getName() + "? Lasă-ne un review!");
+                    notif.setTimestamp(LocalDateTime.now());
+                    notif.setReservationId(r.getId()); // <–– important!
+                    notif.setRestaurantId(r.getRestaurant().getId());
+                    notif.setVerificationId(null);
+                    notificationRepository.save(notif);
+
+                    totalSent++;
                 }
             }
 
-            // marchează ca notificată
+            // Marcare ca notificat
             r.setNotified(true);
             reservationRepository.save(r);
         }
 
-        System.out.println("📩 Emailuri de review trimise: " + pastReservations.size());
+        System.out.println("📩 Emailuri și notificări de review trimise: " + totalSent);
     }
-
-
-
-
 }

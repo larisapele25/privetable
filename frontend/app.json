@@ -31,13 +31,23 @@
             "host": "privetable.app",
             "pathPrefix": "/"
           },
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-web-browser"]
+    "plugins": [
+      "expo-web-browser"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "927a2838-aae4-4b83-89ac-41e8fe9f19d5"
+      }
+    }
   }
 }

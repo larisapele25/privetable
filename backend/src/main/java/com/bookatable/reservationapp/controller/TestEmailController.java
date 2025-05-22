@@ -24,7 +24,7 @@ public class TestEmailController {
             @RequestParam Long userId,
             @RequestParam Long restaurantId
     ) {
-        emailService.sendReviewRequestEmail(to, name, restaurant, reservationId, userId, restaurantId);
+        emailService.sendReviewRequestEmail(to, name, restaurant);
         return ResponseEntity.ok("Email de review trimis către " + to);
     }
 }

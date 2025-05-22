@@ -5,7 +5,7 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API } from '../services/api';
 import { FontAwesome } from '@expo/vector-icons';
-
+import { Ionicons } from '@expo/vector-icons';
 export default function ReviewScreen() {
   const route = useRoute();
   const navigation = useNavigation();
@@ -13,6 +13,10 @@ export default function ReviewScreen() {
   const { reservationId, userId, restaurantId } = route.params || {};
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+
+  console.log("user",userId);
+  console.log("reservation",reservationId);
+  console.log("restaurant", restaurantId);
 
   const handleSubmit = async () => {
     if (!reservationId || !userId || !restaurantId) {
@@ -33,12 +37,15 @@ export default function ReviewScreen() {
         rating,
         comment,
       });
+Alert.alert('Mulțumim!', 'Review-ul tău a fost trimis cu succes.');
+navigation.reset({
+  index: 0,
+  routes: [{ name: 'MainTabs' }],
+});
 
-      Alert.alert('Mulțumim!', 'Review-ul tău a fost trimis cu succes.');
-      navigation.navigate('MainTabs');
     } catch (err) {
-      console.error('Review error:', err);
-      Alert.alert('Eroare', 'Nu am putut trimite review-ul. Încearcă din nou.');
+     
+      Alert.alert('Eroare', 'Ai trimis deja un review.');
     }
   };
 
@@ -57,21 +64,26 @@ export default function ReviewScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lasă un review</Text>
-      <Text style={styles.subtitle}>Cum a fost la restaurant?</Text>
+         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>LEAVE A REVIEW</Text>
+      <Text style={styles.subtitle}>How was your experience?</Text>
 
       <View style={styles.starsContainer}>{renderStars()}</View>
 
       <TextInput
         style={styles.input}
-        placeholder="Comentariu (opțional)"
+        placeholder="Comment (optional)"
         value={comment}
         onChangeText={setComment}
         multiline
       />
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Trimite Review</Text>
+        <Text style={styles.submitText}>Send Review</Text>
       </TouchableOpacity>
     </View>
   );
@@ -79,7 +91,7 @@ export default function ReviewScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, backgroundColor: 'white' },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 10 },
+  title: { fontSize: 24, fontWeight: '400', marginBottom: 10, marginTop: 16 },
   subtitle: { fontSize: 16, marginBottom: 16, color: '#444' },
   starsContainer: { flexDirection: 'row', marginBottom: 20 },
   star: { marginRight: 10 },
@@ -104,4 +116,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+   backButton: { flexDirection: 'row', alignItems: 'center',  marginTop: 70 },
+  backText: { marginLeft: 6, fontSize: 16, color: '#000' }
 });

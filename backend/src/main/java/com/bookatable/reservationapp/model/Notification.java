@@ -31,6 +31,7 @@ public class Notification {
     private User recipient;
 
 
+
     public Notification() {}
 
     public Notification(String message, String type, Long reservationId, User recipient) {
@@ -92,4 +93,5 @@ public class Notification {
     public void setRestaurantId(Long restaurantId) {
         this.restaurantId = restaurantId;
     }
+
 }

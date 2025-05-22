@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View, Text, StyleSheet, FlatList, SafeAreaView,
+  TouchableOpacity, Alert
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '../services/api';
 import { format, parseISO } from 'date-fns';
@@ -15,18 +18,14 @@ const NotificationsScreen = () => {
   const { userId } = useContext(FavoriteContext);
   const navigation = useNavigation();
 
-  // 🔁 Încarcă notificările ascunse
   useEffect(() => {
     const loadHidden = async () => {
       const stored = await AsyncStorage.getItem('hiddenNotificationIds');
-      if (stored) {
-        setHiddenNotificationIds(JSON.parse(stored));
-      }
+      if (stored) setHiddenNotificationIds(JSON.parse(stored));
     };
     loadHidden();
   }, []);
 
-  // 🔁 Fetch notificări
   useEffect(() => {
     const fetchNotifications = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
@@ -42,146 +41,150 @@ const NotificationsScreen = () => {
           API.get(`/reservations/upcoming?userId=${finalUserId}`)
         ]);
 
-        const allNotifications = Array.isArray(notiRes.data) ? notiRes.data : [];
-        const joinedReservationIds = Array.isArray(reservationsRes.data)
-          ? reservationsRes.data.map(r => r.id)
-          : [];
+        const all = Array.isArray(notiRes.data) ? notiRes.data : [];
+        const joinedIds = Array.isArray(reservationsRes.data)
+          ? reservationsRes.data.map(r => r.id) : [];
 
-        setNotifications(allNotifications);
+        setNotifications(all);
+        setAcceptedReservationIds(joinedIds);
 
-        const verifStatuses = {};
-        for (let n of allNotifications) {
+        const statuses = {};
+        for (let n of all) {
           if (n.type === 'VERIFICATION' && n.verificationId) {
             try {
               const res = await API.get(`/verify/status/${n.verificationId}`);
-              verifStatuses[n.verificationId] = res.data.status;
-            } catch (e) {
-              console.error(`Eroare la status verificare ${n.verificationId}:`, e.message);
-            }
+              statuses[n.verificationId] = res.data.status;
+            } catch {}
           }
         }
-        setVerificationStatuses(verifStatuses);
+        setVerificationStatuses(statuses);
       } catch (err) {
-        console.error('Eroare la încărcarea notificărilor:', err);
+        console.error('Eroare notificări:', err);
       }
     };
 
     fetchNotifications();
   }, [userId]);
 
-  // ✅ Accept rezervare și refetch + cleanup
   const handleAccept = async (reservationId) => {
     try {
       const finalUserId = userId || (await AsyncStorage.getItem('userId'));
-      if (!finalUserId) {
-        Alert.alert('Eroare', 'Utilizatorul nu este autentificat.');
-        return;
-      }
+      if (!finalUserId) return Alert.alert('Eroare', 'Utilizatorul nu este autentificat.');
 
       await API.post(`/reservations/${reservationId}/join`, {
         userId: parseInt(finalUserId),
       });
 
       Alert.alert('Succes', 'Ai intrat în rezervare.');
-
-      await API.delete(`/notifications/cleanup/${finalUserId}`);
       const refreshed = await API.get(`/notifications/${finalUserId}`);
       setNotifications(refreshed.data);
-    } catch (err) {
-      console.error('Join error:', err);
+    } catch {
       Alert.alert('Eroare', 'Rezervarea nu a putut fi acceptată.');
     }
   };
 
-  // ✅ Ascunde notificare doar local + persistă
   const handleDeleteNotification = async (notificationId) => {
-    try {
-      const updatedHidden = [...hiddenNotificationIds, notificationId];
-      setHiddenNotificationIds(updatedHidden);
-      await AsyncStorage.setItem('hiddenNotificationIds', JSON.stringify(updatedHidden));
-    } catch (e) {
-      console.error('Eroare la salvarea notificărilor ascunse:', e);
-    }
+    const updated = [...hiddenNotificationIds, notificationId];
+    setHiddenNotificationIds(updated);
+    await AsyncStorage.setItem('hiddenNotificationIds', JSON.stringify(updated));
   };
 
   const renderRightActions = (item) => (
-    <TouchableOpacity
-      onPress={() => handleDeleteNotification(item.id)}
-      style={styles.deleteButton}
-    >
+    <TouchableOpacity onPress={() => handleDeleteNotification(item.id)} style={styles.deleteButton}>
       <Text style={styles.deleteText}>Șterge</Text>
     </TouchableOpacity>
   );
 
   const renderItem = ({ item }) => {
-    const handlePress = () => {
-      if ((item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId) {
-        navigation.navigate('MenuScreen', {
-          restaurantId: item.restaurantId,
-          readOnly: true
-        });
-      }
-    };
+    const show = !hiddenNotificationIds.includes(item.id);
+console.log("NOTIFICARE:", JSON.stringify(item));
 
     return (
-      <Swipeable renderRightActions={() => renderRightActions(item)}>
-        <View style={styles.card}>
-          <Text style={styles.message}>{item.message}</Text>
-          <Text style={styles.timestamp}>
-            {format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}
-          </Text>
+      show && (
+        <Swipeable renderRightActions={() => renderRightActions(item)}>
+          <View style={styles.card}>
+            <Text style={styles.message}>{item.message}</Text>
+            <Text style={styles.timestamp}>{format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}</Text>
 
-          {item.type === 'REENGAGEMENT' && (
-            <Text style={styles.reengageTag}>🍽 Recomandare pentru tine</Text>
-          )}
+            {item.type === 'REENGAGEMENT' && <Text style={styles.reengageTag}>🍽 Recomandare pentru tine</Text>}
 
-          {(item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId && (
-            <TouchableOpacity style={styles.menuButton} onPress={handlePress}>
-              <Text style={styles.menuButtonText}>Vezi meniul</Text>
-            </TouchableOpacity>
-          )}
+            {(item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId && (
+              <TouchableOpacity
+                style={styles.menuButton}
+                onPress={() =>
+                  navigation.navigate('MenuScreen', {
+                    restaurantId: item.restaurantId,
+                    readOnly: true
+                  })
+                }
+              >
+                <Text style={styles.menuButtonText}>Vezi meniul</Text>
+              </TouchableOpacity>
+            )}
 
-          {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
-            <TouchableOpacity
-              style={styles.acceptButton}
-              onPress={() => handleAccept(item.reservationId)}
-            >
-              <Text style={styles.acceptText}>Accept</Text>
-            </TouchableOpacity>
-          )}
+            {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
+              <TouchableOpacity
+                style={styles.acceptButton}
+                onPress={() => handleAccept(item.reservationId)}
+              >
+                <Text style={styles.acceptText}>Accept</Text>
+              </TouchableOpacity>
+            )}
 
-          {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
-            <Text style={styles.acceptedText}>Deja ai acceptat</Text>
-          )}
+            {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
+              <Text style={styles.acceptedText}>Deja ai acceptat</Text>
+            )}
 
-          {item.type === 'VERIFICATION' && item.verificationId && (
-  <Text style={[
-    styles.statusText,
-    verificationStatuses[item.verificationId] === 'PENDING' && { color: '#e6b800' }, // galben
-    verificationStatuses[item.verificationId] === 'APPROVED' && { color: 'green' },
-    verificationStatuses[item.verificationId] === 'REJECTED' && { color: 'crimson' },
-  ]}>
-    Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
-  </Text>
+            {item.type === 'VERIFICATION' && item.verificationId && (
+              <Text style={[
+                styles.statusText,
+                verificationStatuses[item.verificationId] === 'PENDING' && { color: '#e6b800' },
+                verificationStatuses[item.verificationId] === 'APPROVED' && { color: 'green' },
+                verificationStatuses[item.verificationId] === 'REJECTED' && { color: 'crimson' },
+              ]}>
+                Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+              </Text>
+            )}
+
+          {item.type === 'REVIEW_REMINDER' &&
+ item.reservationId && item.restaurantId && item.recipient?.id && (
+  <TouchableOpacity
+    style={styles.reviewButton}
+    onPress={() => {
+      console.log('Navigare Review:', {
+        reservationId: item.reservationId,
+        userId: item.recipient?.id,
+        restaurantId: item.restaurantId
+      });
+
+      navigation.navigate('ReviewScreen', {
+        reservationId: item.reservationId,
+        userId: item.recipient.id,
+        restaurantId: item.restaurantId
+      });
+    }}
+  >
+    <Text style={styles.reviewButtonText}>Lasă un review</Text>
+  </TouchableOpacity>
 )}
 
-        </View>
-      </Swipeable>
+
+
+          </View>
+        </Swipeable>
+      )
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>NOTIFICĂRI</Text>
-      {notifications.filter(n => !hiddenNotificationIds.includes(n.id)).length === 0 ? (
-        <Text style={styles.empty}>Nu ai notificări.</Text>
-      ) : (
-        <FlatList
-          data={notifications.filter(n => !hiddenNotificationIds.includes(n.id))}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
-      )}
+      <FlatList
+        data={notifications.filter(n => !hiddenNotificationIds.includes(n.id))}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={<Text style={styles.empty}>Nu ai notificări.</Text>}
+      />
     </SafeAreaView>
   );
 };
@@ -221,27 +224,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignSelf: 'flex-start',
   },
-  acceptText: {
-    color: 'white',
+  acceptText: { color: 'white', fontWeight: '600', fontSize: 14 },
+  acceptedText: { marginTop: 10, color: 'gray', fontStyle: 'italic' },
+  statusText: { marginTop: 10, fontStyle: 'italic', fontSize: 14 },
+  reengageTag: { color: '#b86b00', fontSize: 13, marginTop: 6, fontStyle: 'italic' },
+  reviewButton: {
+    marginTop: 10,
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  reviewButtonText: {
+    color: '#fff',
     fontWeight: '600',
     fontSize: 14,
-  },
-  acceptedText: {
-    marginTop: 10,
-    color: 'gray',
-    fontStyle: 'italic',
-  },
-  statusText: {
-    marginTop: 10,
-    color: 'green',
-    fontStyle: 'italic',
-    fontSize: 14,
-  },
-  reengageTag: {
-    color: '#b86b00',
-    fontSize: 13,
-    marginTop: 6,
-    fontStyle: 'italic',
   },
   deleteButton: {
     backgroundColor: 'red',
