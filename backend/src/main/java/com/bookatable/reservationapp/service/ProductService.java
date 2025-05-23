@@ -65,7 +65,7 @@ public class ProductService {
         productRepository.save(product);
 
         // Trimite notificare tuturor userilor
-        String message = "Restaurantul " + restaurant.getName() + " și-a actualizat meniul!";
+        String message = "Restaurant " + restaurant.getName() + " has updated its menu!";
 
         List<User> allUsers = userRepository.findAll();
         for (User user : allUsers) {
@@ -102,7 +102,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (!cartItemRepository.findByProductId(productId).isEmpty()) {
-            throw new RuntimeException("Produsul este inclus în comenzi și nu poate fi șters.");
+            throw new RuntimeException("The product is included in orders and cannot be deleted.");
         }
 
         if (!product.getRestaurant().getId().equals(restaurantId)) {

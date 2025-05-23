@@ -11,7 +11,7 @@ export default function AdminLoginScreen() {
 
   const handleVerifyCode = async () => {
     if (!adminCode.trim()) {
-      return Alert.alert('Introdu codul de admin.');
+      return Alert.alert('Enter admin code.');
     }
 
     try {
@@ -24,7 +24,7 @@ export default function AdminLoginScreen() {
       navigation.navigate('AdminPanel', { adminCode });
 
     } catch (err) {
-      Alert.alert('Cod invalid', 'Codul de admin este greșit.');
+      Alert.alert('Invalid code', 'Incorrect admin code.');
     }
   };
 
@@ -47,7 +47,7 @@ export default function AdminLoginScreen() {
   onPress={() => navigation.navigate('Login')}
   style={styles.backButton}
 >
-  <Text style={styles.backButtonText}>← Înapoi la login</Text>
+  <Text style={styles.backButtonText}>← Back to user Login</Text>
 </TouchableOpacity>
 
     </View>

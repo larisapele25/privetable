@@ -12,7 +12,6 @@ import {
 import { API } from '../services/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View as RNView } from 'react-native'; // pentru View nested în TouchableOpacity
 
 const HomeScreen = ({ navigation }) => {
   const [upcomingData, setUpcomingData] = useState([]);
@@ -20,23 +19,17 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userId = await AsyncStorage.getItem('userId');
         if (!userId) return;
-  
-        const res1 = await API.get('/reservations/upcoming', {
-          params: { userId },
-        });
-  
-        const res2 = await API.get('/restaurants/booked-before', {
-          params: { userId },
-        });
-  
-        const res3 = await API.get(`/notifications/unread-count/${userId}`);
+
+        const [res1, res2, res3] = await Promise.all([
+          API.get('/reservations/upcoming', { params: { userId } }),
+          API.get('/restaurants/booked-before', { params: { userId } }),
+          API.get(`/notifications/unread-count/${userId}`),
+        ]);
 
         setUpcomingData(res1.data || []);
         setBookAgainData(res2.data || []);
@@ -47,26 +40,25 @@ const HomeScreen = ({ navigation }) => {
         setLoading(false);
       }
     };
-  
+
     const unsubscribe = navigation.addListener('focus', fetchData);
     fetchData();
-  
+
     return unsubscribe;
   }, [navigation]);
-  
 
   const renderUpcoming = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={styles.cardu
+      }
       onPress={() =>
         navigation.navigate('ReservationDetails', { reservationId: item.id })
       }
     >
       <Text style={styles.cardTitle}>{item.restaurantName}</Text>
-      <Text>{item.date} • {item.time}</Text>
+      <Text style={styles.cardSubtitle}>{item.date} • {item.time}</Text>
     </TouchableOpacity>
   );
-  
 
   const renderBookAgain = ({ item }) => (
     <TouchableOpacity
@@ -76,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
           restaurant: {
             id: item.id,
             name: item.name,
-            imageUrl: item.imageUrl, 
+            imageUrl: item.imageUrl,
           }
         })
       }
@@ -85,14 +77,11 @@ const HomeScreen = ({ navigation }) => {
       <Text style={styles.cardTitle}>{item.name}</Text>
     </TouchableOpacity>
   );
-  
-  
-  
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
+        <ActivityIndicator size="large" color="#000" />
       </SafeAreaView>
     );
   }
@@ -106,23 +95,21 @@ const HomeScreen = ({ navigation }) => {
           style={styles.logoImage}
         />
         <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
-  <View style={{ position: 'relative' }}>
-    <Icon name="notifications-outline" size={24} color="#000" />
-    {unreadCount > 0 && (
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>
-          {unreadCount > 9 ? '9+' : unreadCount}
-        </Text>
-      </View>
-    )}
-  </View>
-</TouchableOpacity>
-
-
+          <View style={{ position: 'relative' }}>
+            <Icon name="notifications-outline" size={26} color="#000" />
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
-        <Text style={[styles.sectionTitle, { marginTop: 30 }]}>Upcoming</Text>
+        <Text style={styles.sectionTitle}>Upcoming</Text>
         {upcomingData.length === 0 ? (
           <Text style={styles.emptyText}>No upcoming reservations.</Text>
         ) : (
@@ -154,7 +141,6 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('ChooseRestaurant')}
-
         >
           <Text style={styles.buttonText}>Book a Table</Text>
         </TouchableOpacity>
@@ -168,11 +154,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
+    backgroundColor: '#fafafa',
   },
   header: {
     flexDirection: 'row',
@@ -187,70 +169,109 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'contain',
   },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '500',
-    marginBottom: 10,
-    marginTop: 20,
-  },
-  list: {
-    paddingBottom: 10,
-  },
-  card: {
-    width: 140,
-    height: 100,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 12,
-    padding: 10,
-    marginRight: 10,
-    justifyContent: 'center',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  image: {
-    width: '100%',
-    height: 50,
-    borderRadius: 8,
-    marginBottom: 5,
-  },
-  button: {
-    backgroundColor: 'black',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 30,
-    marginBottom: 40,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginVertical: 12,
+    color: '#111',
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#999',
     fontSize: 14,
     fontStyle: 'italic',
     marginTop: 10,
   },
+  list: {
+    paddingBottom: 16,
+  },
+  card: {
+    width: 160,
+    height: 150,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
+    justifyContent: 'flex-start',
+  },
+
+   cardu: {
+    width: 160,
+    height: 100,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
+    justifyContent: 'flex-start',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 8,
+    color: '#222',
+  },
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 4,
+  },
+  image: {
+    width: '100%',
+    height: 90,
+    borderRadius: 12,
+    backgroundColor: '#eee',
+  },
+  button: {
+    backgroundColor: '#000',
+    paddingVertical: 16,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 50,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -8,
-    backgroundColor: 'red',
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 4,
+    top: -5,
+    right: -6,
+    backgroundColor: '#ff3b30',
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    height: 18,
+    minWidth: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   badgeText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 10,
-    fontWeight: 'bold',
   },
-  
 });

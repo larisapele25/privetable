@@ -15,8 +15,8 @@ public class EmailService {
         System.out.println("📧 Trimit email resetare către: " + to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Resetare parolă - BookApp");
-        message.setText("Codul tău de resetare este: " + code + "\n\nAcest cod este valabil timp de 15 minute.");
+        message.setSubject("Reset password - PrivéTable\n");
+        message.setText("Your reset code is: " + code + "\n\nThis code is valid for 15 minutes.");
         mailSender.send(message);
     }
 
@@ -24,12 +24,12 @@ public class EmailService {
         System.out.println("🔔 Trimit reminder către: " + to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Reminder rezervare - PrivéTable");
+        message.setSubject("Reservation reminder - PrivéTable");
         message.setText(
-                "Hei " + name + ",\n\n" +
-                        "Ai o rezervare la restaurantul " + restaurant + " azi la ora " + time + ".\n" +
-                        "Dacă vrei să anulezi sau să reprogramezi, intră în aplicație.\n\n" +
-                        "Echipa PrivéTable"
+                "Hi " + name + ",\n\n" +
+                        "You have a reservation at the  " + restaurant + " today at " + time + ".\n" +
+                        "If you want to cancel or reschedule, go to the app.\n\n" +
+                        "PrivéTable Team"
         );
         mailSender.send(message);
     }
@@ -39,14 +39,14 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Cum ți s-a părut experiența ta? ✨");
+        message.setSubject("How was your experience? ✨");
         message.setText(
-                "Salut " + name + ",\n\n" +
-                        "Ne bucurăm că ai ales serviciile PrivéTable!\n" +
-                        "Ai avut o rezervare la " + restaurantName + " și ne-ar plăcea să aflăm cum a fost.\n\n" +
-                        "Deschide aplicația PrivéTable și lasă un review cu 1–5 stele și, opțional, un comentariu.\n\n" +
-                        "Mulțumim că ești cu noi!\n" +
-                        "Echipa PrivéTable 💜"
+                "Hi " + name + ",\n\n" +
+                        "We are glad you chose PrivéTable services!\n" +
+                        "You had a reservation at " + restaurantName + "and we would love to know how it was.\n\n" +
+                        "Open the PrivéTable app and leave us a review.\n\n" +
+                        "Thank you for being with us!\n" +
+                        "PrivéTable Team "
         );
 
         mailSender.send(message);

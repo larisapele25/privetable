@@ -23,11 +23,13 @@ export default function RestaurantLoginScreen({ navigation }) {
       const data = await response.json();
       await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.setItem('restaurantId', data.restaurantId.toString());
+     await AsyncStorage.setItem('restaurantName', data.restaurantName);
 
-      Alert.alert('Autentificare reușită', 'Bun venit!');
+
+      Alert.alert('Login successful', 'Welcome!');
       navigation.navigate('RestaurantDashboard');
     } catch (error) {
-      Alert.alert('Eroare la autentificare', 'Verifică loginCode și parola.');
+      Alert.alert('Authentication error', 'Check loginCode and password.');
     }
   };
 
@@ -67,11 +69,11 @@ export default function RestaurantLoginScreen({ navigation }) {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Autentificare</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Login ca utilizator</Text>
+        <Text style={styles.link}>Login as user</Text>
       </TouchableOpacity>
     </View>
   );

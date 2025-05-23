@@ -10,8 +10,8 @@ export default function AdminPanelScreen() {
   const { adminCode } = route.params;
 
   const handleLogout = () => {
-    Alert.alert('Confirmare', 'Sigur vrei să te deloghezi?', [
-      { text: 'Anulează', style: 'cancel' },
+    Alert.alert('Confirmation', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
       {
         text: 'Logout',
         style: 'destructive',

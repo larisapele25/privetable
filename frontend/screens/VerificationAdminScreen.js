@@ -61,7 +61,7 @@ const VerificationAdminScreen = () => {
         <View key={req.id} style={styles.card}>
           <Text style={styles.name}>{req.name} {req.surname}</Text>
           <Text style={styles.label}>CNP: {req.cnp}</Text>
-          <Text style={styles.label}>Seria: {req.idNumber}</Text>
+          <Text style={styles.label}>ID: {req.idNumber}</Text>
           <Text style={styles.label}>Status: {
             req.reviewedByAdmin
               ? (req.verificationStatus ? '✅ Aproved' : '❌ Rejected')

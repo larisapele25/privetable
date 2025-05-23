@@ -88,22 +88,22 @@ import java.util.Set;
 
         // Folosești metoda adăugată acum
         if (!authService.checkPassword(user, request.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Parola este greșită.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
         }
 
         if (!request.getNewEmail().equals(request.getConfirmEmail())) {
-            return ResponseEntity.badRequest().body("Emailurile nu coincid.");
+            return ResponseEntity.badRequest().body("Emails don't match.");
         }
 
         if (!request.getNewEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
-            return ResponseEntity.badRequest().body("Emailul nu este valid.");
+            return ResponseEntity.badRequest().body("Email address is incorrect.");
         }
 
         // Salvezi noul email
         user.setEmail(request.getNewEmail());
         userRepository.save(user);
 
-        return ResponseEntity.ok("Email actualizat cu succes.");
+        return ResponseEntity.ok("Email changed successfully");
     }
 
 

@@ -44,12 +44,12 @@ public class ReviewController {
                     .anyMatch(p -> p.getId().equals(userId));
 
             if (!isCreator && !isParticipant) {
-                return ResponseEntity.status(403).body("Nu ai participat la această rezervare.");
+                return ResponseEntity.status(403).body("You did not participate in this reservation.");
             }
 
             // ⏳ Verificare dacă rezervarea este în trecut
             if (reservation.getDateTime().isAfter(LocalDateTime.now())) {
-                return ResponseEntity.badRequest().body("Nu poți lăsa review pentru o rezervare viitoare.");
+                return ResponseEntity.badRequest().body("You cannot leave a review for a future booking.");
             }
 
             // 🔁 Prevenire review dublu
@@ -57,7 +57,7 @@ public class ReviewController {
                     .anyMatch(r -> r.getReservation().getId().equals(reservationId));
 
             if (alreadyReviewed) {
-                return ResponseEntity.badRequest().body("Ai trimis deja un review pentru această rezervare.");
+                return ResponseEntity.badRequest().body("You have already submitted a review for this reservation.");
             }
 
             // ✅ Creare review
@@ -69,17 +69,37 @@ public class ReviewController {
             review.setComment(comment);
 
             reviewRepository.save(review);
-            return ResponseEntity.ok("Review salvat cu succes.");
+            return ResponseEntity.ok("Review saved successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Eroare internă: " + e.getMessage());
         }
     }
 
+
+
     @GetMapping("/restaurant/{id}")
-    public ResponseEntity<List<Review>> getReviewsForRestaurant(@PathVariable Long id) {
-        return ResponseEntity.ok(reviewRepository.findByRestaurantId(id));
+    public ResponseEntity<List<Map<String, Object>>> getReviewsForRestaurant(@PathVariable Long id) {
+        List<Review> reviews = reviewRepository.findByRestaurantId(id);
+
+        List<Map<String, Object>> result = reviews.stream().map(review -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("rating", review.getRating());
+            map.put("comment", review.getComment());
+
+            // 👇 Adăugăm doar ce trebuie
+            if (review.getUser() != null) {
+                map.put("userId", review.getUser().getId());
+            }
+
+            if (review.getReservation() != null) {
+                map.put("reservationDateTime", review.getReservation().getDateTime());
+            }
+
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(result);
     }
-   
 
 
 }

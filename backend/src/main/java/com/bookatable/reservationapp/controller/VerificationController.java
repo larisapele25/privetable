@@ -73,17 +73,17 @@ public class VerificationController {
             Notification noti = new Notification();
             noti.setRecipient(userOpt.get());
             noti.setType("VERIFICATION");
-            noti.setMessage("Verificarea contului este în curs. Poate dura până la 24h.");
+            noti.setMessage("Account verification is in progress. It may take up to 24 hours.");
             noti.setTimestamp(LocalDateTime.now());
             noti.setVerificationId(saved.getId());
             notificationRepository.save(noti);
 
-            return ResponseEntity.ok("Verificare trimisă. Un administrator o va procesa manual.");
+            return ResponseEntity.ok("Verification sent. An administrator will process it manually.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Eroare: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Eroare server: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
 
@@ -103,7 +103,7 @@ public class VerificationController {
                 Notification noti = new Notification();
                 noti.setRecipient(user);
                 noti.setType("VERIFICATION");
-                noti.setMessage("Contul tău a fost verificat cu succes.");
+                noti.setMessage("Your account has been successfully verified.");
                 noti.setTimestamp(LocalDateTime.now());
 
 //  Siguranță: setează ID-ul explicit DOAR dacă este salvat
@@ -116,7 +116,7 @@ public class VerificationController {
 
             }
 
-            return ResponseEntity.ok("Verificare aprobată.");
+            return ResponseEntity.ok("Verification approved.");
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID inexistent."));
     }
 
@@ -134,9 +134,9 @@ public class VerificationController {
                 Notification noti = new Notification();
                 noti.setRecipient(user);
                 noti.setType("VERIFICATION");
-                String message = "Contul tău nu a fost verificat.";
+                String message = "Your account has not been verified.";
                 if (comment != null && !comment.isBlank()) {
-                    message += " Motiv: " + comment;
+                    message += " Reason: " + comment;
                 }
                 noti.setMessage(message);
                 noti.setTimestamp(LocalDateTime.now());
@@ -144,7 +144,7 @@ public class VerificationController {
                 notificationRepository.save(noti);
             }
 
-            return ResponseEntity.ok("Verificare respinsă.");
+            return ResponseEntity.ok("Verification rejected.");
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID inexistent."));
     }
 
@@ -170,7 +170,7 @@ public class VerificationController {
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        Map.of("error", "Verificarea nu a fost găsită")
+                        Map.of("error", "Verification not found.")
                 ));
     }
 

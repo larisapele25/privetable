@@ -54,8 +54,8 @@ public class NotificationService {
                 List<Restaurant> favoriteList = new ArrayList<>(user.getFavoriteRestaurants());
                 Restaurant restaurant = favoriteList.get(new Random().nextInt(favoriteList.size()));
 
-                String message = "🍽 Revino la " + restaurant.getName() +
-                        " – meniul tău preferat te așteaptă!";
+                String message = "🍽 Come back to " + restaurant.getName() +
+                        " – your favorite menu awaits you!";
 
                 Notification notif = new Notification();
                 notif.setMessage(message);

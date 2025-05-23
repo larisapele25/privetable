@@ -46,7 +46,7 @@ private final RestaurantRepository restaurantRepository;
         RestaurantAccount account = optional.get();
         String token = jwtService.generateToken(account.getRestaurant().getId());
 
-        return ResponseEntity.ok(new RestaurantLoginResponse(token, account.getRestaurant().getId()));
+        return ResponseEntity.ok(new RestaurantLoginResponse(token, account.getRestaurant().getId(),account.getRestaurant().getName()));
     }
     @PostMapping("/generate-account/{restaurantId}")
     public ResponseEntity<?> generateAccountForRestaurant(@PathVariable Long restaurantId) {

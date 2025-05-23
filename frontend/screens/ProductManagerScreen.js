@@ -20,17 +20,17 @@ export default function ProductManagerScreen({ navigation }) {
       const res = await fetch('http://192.168.0.234:8080/api/restaurant/products', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Eroare la încărcare produse');
+      if (!res.ok) throw new Error('Error loading products');
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      Alert.alert('Eroare', err.message || 'Nu s-au putut încărca produsele.');
+      Alert.alert('Error', err.message || 'Unable to load products.');
     }
   };
 
   const handleSubmit = async () => {
     if (!form.name || !form.price || !form.category) {
-      Alert.alert('Câmpuri obligatorii', 'Completează numele, prețul și categoria.');
+      Alert.alert('Required fields', 'Fill in the name, price and category.');
       return;
     }
 
@@ -54,20 +54,20 @@ export default function ProductManagerScreen({ navigation }) {
     });
 
     if (res.ok) {
-      Alert.alert(editId ? 'Actualizat' : 'Adăugat', 'Produsul a fost salvat.');
+      Alert.alert(editId ? 'Updated' : 'Added', 'The product has been saved.');
       setForm({ name: '', description: '', price: '', category: '' });
       setEditId(null);
       fetchProducts();
     } else {
-      Alert.alert('Eroare', 'Produsul nu a putut fi salvat.');
+      Alert.alert('Error', 'The product could not be saved.');
     }
   };
 
   const handleDelete = (id) => {
-    Alert.alert('Confirmare', 'Sigur vrei să ștergi acest produs?', [
-      { text: 'Anulează', style: 'cancel' },
+    Alert.alert('Confirm', 'Are you sure you want to delete this product?', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Șterge',
+        text: 'Delete',
         style: 'destructive',
         onPress: async () => {
           const token = await AsyncStorage.getItem('token');
@@ -76,10 +76,10 @@ export default function ProductManagerScreen({ navigation }) {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {
-            Alert.alert('Șters', 'Produsul a fost eliminat.');
+            Alert.alert('Deleted', 'The product has been removed.');
             fetchProducts();
           } else {
-            Alert.alert('Eroare', 'Produsul nu a putut fi șters.');
+            Alert.alert('Error', 'The product could not be deleted.');
           }
         },
       },
@@ -105,15 +105,15 @@ export default function ProductManagerScreen({ navigation }) {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
 
-            <Text style={styles.title}>GESTIONARE PRODUSE</Text>
+            <Text style={styles.title}>PRODUCT MANAGER</Text>
 
             {['name', 'description', 'price', 'category'].map((field) => (
               <TextInput
                 key={field}
                 placeholder={
-                  field === 'name' ? 'Nume produs' :
-                  field === 'description' ? 'Descriere' :
-                  field === 'price' ? 'Preț' : 'Categorie'
+                  field === 'name' ? 'Product name' :
+                  field === 'description' ? 'Description' :
+                  field === 'price' ? 'Price' : 'Category'
                 }
                 style={styles.input}
                 keyboardType={field === 'price' ? 'numeric' : 'default'}
@@ -123,7 +123,7 @@ export default function ProductManagerScreen({ navigation }) {
             ))}
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>{editId ? 'Actualizează' : 'Adaugă produs'}</Text>
+              <Text style={styles.buttonText}>{editId ? 'Update' : 'Add product'}</Text>
             </TouchableOpacity>
           </>
         }

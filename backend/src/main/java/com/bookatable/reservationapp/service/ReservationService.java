@@ -236,17 +236,17 @@ public class ReservationService {
 
     public void cancelReservation(Long reservationId, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Rezervarea nu există"));
+                .orElseThrow(() -> new RuntimeException("The reservation does not exist"));
 
         if (!reservation.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Doar creatorul poate anula această rezervare");
+            throw new RuntimeException("Only the creator can cancel this reservation.");
         }
 
         if (reservation.getDateTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Rezervarea a trecut deja și nu mai poate fi anulată");
+            throw new RuntimeException("The reservation has already passed and cannot be canceled.");
         }
         if (reservation.getDateTime().minusHours(2).isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Rezervarea poate fi anulată doar cu minim 2 ore înainte.");
+            throw new RuntimeException("The reservation can only be canceled at least 2 hours in advance.");
         }
 
 

@@ -26,7 +26,7 @@ export default function AddRestaurantScreen({ route }) {
     const { name, imageUrl, capacity } = form;
 
     if (!name || !imageUrl || !capacity) {
-      Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii!');
+      Alert.alert('Error', 'All fields are required!');
       return;
     }
 
@@ -46,7 +46,7 @@ export default function AddRestaurantScreen({ route }) {
         }
       );
 
-      setResponseText(`✅ Restaurant adăugat!\nLoginCode: ${res.data.loginCode}`);
+      setResponseText(`✅ Restaurant added!\nLoginCode: ${res.data.loginCode}`);
       setForm({ name: '', imageUrl: '', capacity: '' });
     } catch (err) {
       console.error(err);

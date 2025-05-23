@@ -55,7 +55,7 @@ public class ReservationReviewSchedulerService {
                 Notification notif = new Notification();
                 notif.setRecipient(creator);
                 notif.setType("REVIEW_REMINDER");
-                notif.setMessage("📝 Ai fost la " + r.getRestaurant().getName() + "? Lasă-ne un review!");
+                notif.setMessage("📝 Have you been to the " + r.getRestaurant().getName() + "? Leave us a review!");
                 notif.setTimestamp(LocalDateTime.now());
                 notif.setReservationId(r.getId()); // <–– important!
                 notif.setRestaurantId(r.getRestaurant().getId());
@@ -76,7 +76,7 @@ public class ReservationReviewSchedulerService {
                     Notification notif = new Notification();
                     notif.setRecipient(participant);
                     notif.setType("REVIEW_REMINDER");
-                    notif.setMessage("📝 Ai fost la " + r.getRestaurant().getName() + "? Lasă-ne un review!");
+                    notif.setMessage("📝 Have you been to the " + r.getRestaurant().getName() + "? Leave us a review!");
                     notif.setTimestamp(LocalDateTime.now());
                     notif.setReservationId(r.getId()); // <–– important!
                     notif.setRestaurantId(r.getRestaurant().getId());

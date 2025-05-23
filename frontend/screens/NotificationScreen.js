@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
   View, Text, StyleSheet, FlatList, SafeAreaView,
-  TouchableOpacity, Alert
+  TouchableOpacity, Alert, Platform, LayoutAnimation, UIManager
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '../services/api';
@@ -9,6 +9,11 @@ import { format, parseISO } from 'date-fns';
 import { FavoriteContext } from '../context/FavoriteContext';
 import { useNavigation } from '@react-navigation/native';
 import { Swipeable } from 'react-native-gesture-handler';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -84,6 +89,7 @@ const NotificationsScreen = () => {
   };
 
   const handleDeleteNotification = async (notificationId) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const updated = [...hiddenNotificationIds, notificationId];
     setHiddenNotificationIds(updated);
     await AsyncStorage.setItem('hiddenNotificationIds', JSON.stringify(updated));
@@ -96,161 +102,207 @@ const NotificationsScreen = () => {
   );
 
   const renderItem = ({ item }) => {
-    const show = !hiddenNotificationIds.includes(item.id);
-console.log("NOTIFICARE:", JSON.stringify(item));
+    if (hiddenNotificationIds.includes(item.id)) return null;
+
+    const statusColor = {
+      PENDING: { backgroundColor: '#fff4e5', color: '#e6b800' },
+      APPROVED: { backgroundColor: '#e0f7e9', color: 'green' },
+      REJECTED: { backgroundColor: '#ffe6e6', color: 'crimson' },
+    };
 
     return (
-      show && (
-        <Swipeable renderRightActions={() => renderRightActions(item)}>
-          <View style={styles.card}>
-            <Text style={styles.message}>{item.message}</Text>
-            <Text style={styles.timestamp}>{format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}</Text>
+      <Swipeable renderRightActions={() => renderRightActions(item)}>
+        <View style={styles.card}>
+          <Text style={styles.message}>{item.message}</Text>
+          <Text style={styles.timestamp}>{format(parseISO(item.timestamp), 'dd MMM yyyy, HH:mm')}</Text>
 
-            {item.type === 'REENGAGEMENT' && <Text style={styles.reengageTag}>🍽 Recomandare pentru tine</Text>}
+          {item.type === 'REENGAGEMENT' && (
+            <Text style={styles.tag}>🍽 
+Recommendation for you</Text>
+          )}
 
-            {(item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId && (
-              <TouchableOpacity
-                style={styles.menuButton}
-                onPress={() =>
-                  navigation.navigate('MenuScreen', {
-                    restaurantId: item.restaurantId,
-                    readOnly: true
-                  })
-                }
-              >
-                <Text style={styles.menuButtonText}>Vezi meniul</Text>
-              </TouchableOpacity>
-            )}
+          {(item.type === 'MENU_UPDATE' || item.type === 'REENGAGEMENT') && item.restaurantId && (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() =>
+                navigation.navigate('MenuScreen', {
+                  restaurantId: item.restaurantId,
+                  readOnly: true,
+                })
+              }
+            >
+              <Text style={styles.buttonText}>View Menu</Text>
+            </TouchableOpacity>
+          )}
 
-            {item.type === 'INVITE' && item.reservationId && !acceptedReservationIds.includes(item.reservationId) && (
+          {item.type === 'INVITE' &&
+            item.reservationId &&
+            !acceptedReservationIds.includes(item.reservationId) && (
               <TouchableOpacity
                 style={styles.acceptButton}
                 onPress={() => handleAccept(item.reservationId)}
               >
-                <Text style={styles.acceptText}>Accept</Text>
+                <Text style={styles.buttonText}>Accept</Text>
               </TouchableOpacity>
             )}
 
-            {item.type === 'INVITE' && acceptedReservationIds.includes(item.reservationId) && (
-              <Text style={styles.acceptedText}>Deja ai acceptat</Text>
+          {item.type === 'INVITE' &&
+            acceptedReservationIds.includes(item.reservationId) && (
+              <Text style={styles.acceptedText}>✔ You already accepted.</Text>
             )}
 
-            {item.type === 'VERIFICATION' && item.verificationId && (
-              <Text style={[
-                styles.statusText,
-                verificationStatuses[item.verificationId] === 'PENDING' && { color: '#e6b800' },
-                verificationStatuses[item.verificationId] === 'APPROVED' && { color: 'green' },
-                verificationStatuses[item.verificationId] === 'REJECTED' && { color: 'crimson' },
-              ]}>
-                Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
-              </Text>
-            )}
+          {item.type === 'VERIFICATION' && item.verificationId && (
+            <Text style={[
+              styles.statusText,
+              statusColor[verificationStatuses[item.verificationId]] || {},
+            ]}>
+              Status: {verificationStatuses[item.verificationId] || 'Se verifică...'}
+            </Text>
+          )}
 
           {item.type === 'REVIEW_REMINDER' &&
- item.reservationId && item.restaurantId && item.recipient?.id && (
-  <TouchableOpacity
-    style={styles.reviewButton}
-    onPress={() => {
-      console.log('Navigare Review:', {
-        reservationId: item.reservationId,
-        userId: item.recipient?.id,
-        restaurantId: item.restaurantId
-      });
-
-      navigation.navigate('ReviewScreen', {
-        reservationId: item.reservationId,
-        userId: item.recipient.id,
-        restaurantId: item.restaurantId
-      });
-    }}
-  >
-    <Text style={styles.reviewButtonText}>Lasă un review</Text>
-  </TouchableOpacity>
-)}
-
-
-
-          </View>
-        </Swipeable>
-      )
+            item.reservationId &&
+            item.restaurantId &&
+            item.recipient?.id && (
+              <TouchableOpacity
+                style={styles.reviewButton}
+                onPress={() =>
+                  navigation.navigate('ReviewScreen', {
+                    reservationId: item.reservationId,
+                    userId: item.recipient.id,
+                    restaurantId: item.restaurantId,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>Leave a review</Text>
+              </TouchableOpacity>
+            )}
+        </View>
+      </Swipeable>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>NOTIFICĂRI</Text>
+      <Text style={styles.title}>NOTIFICATION</Text>
       <FlatList
         data={notifications.filter(n => !hiddenNotificationIds.includes(n.id))}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={<Text style={styles.empty}>Nu ai notificări.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>You don't have notifications yet.</Text>}
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'white' },
-  title: { fontSize: 24, fontWeight: '400', marginBottom: 20, marginTop: 40, paddingLeft: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    paddingTop: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '400',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    color: '#222',
+    marginTop: 40
+  },
   card: {
-    backgroundColor: '#f3f3f3',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 12,
-    marginLeft: 20,
-    marginRight: 20,
+    backgroundColor: '#ffffff',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
   },
-  message: { fontSize: 16, fontWeight: '500' },
-  timestamp: { fontSize: 12, color: '#888', marginTop: 6 },
-  empty: { textAlign: 'center', color: '#888', marginTop: 50 },
-  menuButton: {
-    marginTop: 10,
-    backgroundColor: 'black',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-  },
-  menuButtonText: {
-    color: 'white',
+  message: {
+    fontSize: 16,
     fontWeight: '600',
-    fontSize: 14,
+    color: '#1a1a1a',
   },
-  acceptButton: {
-    backgroundColor: 'black',
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-    marginTop: 10,
+  timestamp: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+  },
+  tag: {
+    backgroundColor: '#fff4e6',
+    color: '#b86b00',
+    fontSize: 12,
+    fontWeight: '500',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 14,
     alignSelf: 'flex-start',
+    marginTop: 8,
   },
-  acceptText: { color: 'white', fontWeight: '600', fontSize: 14 },
-  acceptedText: { marginTop: 10, color: 'gray', fontStyle: 'italic' },
-  statusText: { marginTop: 10, fontStyle: 'italic', fontSize: 14 },
-  reengageTag: { color: '#b86b00', fontSize: 13, marginTop: 6, fontStyle: 'italic' },
-  reviewButton: {
+  menuButton: {
     marginTop: 10,
     backgroundColor: '#000',
     paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 20,
+    paddingHorizontal: 18,
+    borderRadius: 25,
     alignSelf: 'flex-start',
   },
-  reviewButtonText: {
-    color: '#fff',
+  acceptButton: {
+    marginTop: 10,
+    backgroundColor: '#111',
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    borderRadius: 25,
+    alignSelf: 'flex-start',
+  },
+  reviewButton: {
+    marginTop: 10,
+    backgroundColor: '#222',
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    borderRadius: 25,
+    alignSelf: 'flex-start',
+  },
+  buttonText: {
+    color: 'white',
     fontWeight: '600',
     fontSize: 14,
   },
-  deleteButton: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    padding: 20,
+  acceptedText: {
+    marginTop: 10,
+    fontStyle: 'italic',
+    color: 'gray',
+    fontSize: 14,
+  },
+  statusText: {
+    marginTop: 10,
+    fontSize: 13,
+    fontWeight: '500',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  deleteButton: {
+    backgroundColor: 'crimson',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginVertical: 8,
   },
   deleteText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+  empty: {
+    textAlign: 'center',
+    color: '#aaa',
+    marginTop: 50,
+    fontSize: 16,
   },
 });
 
