@@ -21,9 +21,9 @@ const ReservationDetailsScreen = () => {
   const { reservationId } = route.params;
 
   const [reservation, setReservation] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [userTotal, setUserTotal] = useState(0);
+   const [loading, setLoading] = useState(true);
   const [participants, setParticipants] = useState([]);
   const { userId } = useContext(FavoriteContext);
 
@@ -162,7 +162,7 @@ console.log('Match:', reservation.createdById === userId);
               name: 'Plată masă'
             })}
           >
-            <Text style={styles.buttonText}>Total masă: {total} RON</Text>
+            <Text style={styles.buttonText}>Table Total: {total} Lei</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -172,7 +172,7 @@ console.log('Match:', reservation.createdById === userId);
               name: 'Plată personală'
             })}
           >
-            <Text style={styles.buttonText}>Total personal: {userTotal} RON</Text>
+            <Text style={styles.buttonText}>Personal Total: {userTotal} Lei</Text>
           </TouchableOpacity>
 
           {isCreator && (
@@ -180,7 +180,7 @@ console.log('Match:', reservation.createdById === userId);
               style={[styles.baseButton, { backgroundColor: 'red' }]}
               onPress={handleCancelReservation}
             >
-              <Text style={styles.buttonText}>Anulează rezervarea</Text>
+              <Text style={styles.buttonText}>Cancel Reservation</Text>
             </TouchableOpacity>
           )}
         </View>

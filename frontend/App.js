@@ -22,7 +22,8 @@ import AddRestaurantScreen from './screens/AddRestaurantScreen';
 import AdminRestaurantListScreen from './screens/AdminRestaurantListScreen';
 import VerificationAdminScreen from './screens/VerificationAdminScreen';
 import ReviewScreen from './screens/ReviewScreen';
-
+import LeaveReviewScreen from './screens/LeaveReviewScreen';
+import UserReviewHistory from './screens/UserReviewHistory';
 const Stack = createNativeStackNavigator();
 
 // 🔗 Configurație pentru deep linking
@@ -79,6 +80,9 @@ export default function App() {
             <Stack.Screen name="AdminRestaurantList" component={AdminRestaurantListScreen} />
             <Stack.Screen name="VerificationAdmin" component={VerificationAdminScreen} />
             <Stack.Screen name="ReviewScreen" component={ReviewScreen} />
+            <Stack.Screen name="LeaveReviewScreen" component={LeaveReviewScreen}/>
+            <Stack.Screen name="UserReviewHistory" component={UserReviewHistory} />
+
             <Stack.Screen
               name="ForgotPassword"
               component={ForgotPasswordScreen}

@@ -3,11 +3,13 @@ import {
   View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, Alert
 } from 'react-native';
 import { API } from '../services/api';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const VerificationAdminScreen = () => {
   const [requests, setRequests] = useState([]);
   const navigation = useNavigation();
+  const route = useRoute();
+  const { adminCode } = route.params;
 
   useEffect(() => {
     fetchVerifications();
@@ -15,10 +17,15 @@ const VerificationAdminScreen = () => {
 
   const fetchVerifications = async () => {
     try {
-      const res = await API.get('/verify/all');
+      const res = await API.get('/verify/all', {
+        headers: {
+          'X-ADMIN-CODE': adminCode
+        }
+      });
       setRequests(res.data);
     } catch (err) {
       console.error('Eroare la fetch:', err);
+      Alert.alert('Eroare', 'Nu s-au putut încărca cererile de verificare.');
     }
   };
 
@@ -64,7 +71,7 @@ const VerificationAdminScreen = () => {
           <Text style={styles.label}>ID: {req.idNumber}</Text>
           <Text style={styles.label}>Status: {
             req.reviewedByAdmin
-              ? (req.verificationStatus ? '✅ Aproved' : '❌ Rejected')
+              ? (req.verificationStatus ? '✅ Approved' : '❌ Rejected')
               : '⏳ În așteptare'
           }</Text>
 

@@ -29,8 +29,9 @@ public class NotificationController {
 
     @GetMapping("/{userId}")
     public List<Notification> getNotifications(@PathVariable Long userId) {
-        return notificationRepository.findByRecipientIdOrderByTimestampDesc(userId);
+        return notificationRepository.findByRecipientIdAndDeletedFalseOrderByTimestampDesc(userId);
     }
+
     @GetMapping("/unread-count/{userId}")
     public ResponseEntity<Integer> getUnreadCount(@PathVariable Long userId) {
         int count = notificationRepository.countByRecipientIdAndReadFalse(userId);
@@ -45,21 +46,12 @@ public class NotificationController {
         notificationRepository.saveAll(notifications);
         return ResponseEntity.ok("Notificările au fost marcate ca citite");
     }
-    @DeleteMapping("/delete-invite/{userId}/{reservationId}")
-    public ResponseEntity<?> deleteInviteNotification(@PathVariable Long userId, @PathVariable Long reservationId) {
-        List<Notification> notifs = notificationRepository.findByRecipientId(userId);
-        for (Notification notif : notifs) {
-            if ("INVITE".equals(notif.getType()) && reservationId.equals(notif.getReservationId())) {
-                notificationRepository.delete(notif);
-            }
-        }
-        return ResponseEntity.ok("Notification deleted");
-    }
 
-    @DeleteMapping("/cleanup/{userId}")
+
+    @PutMapping("/cleanup/{userId}")
     public ResponseEntity<?> cleanupOldOrAcceptedInvites(@PathVariable Long userId) {
         List<Notification> all = notificationRepository.findByRecipientId(userId);
-        List<Notification> toDelete = new ArrayList<>();
+        List<Notification> toMarkDeleted = new ArrayList<>();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -70,20 +62,18 @@ public class NotificationController {
                 if (res == null) continue;
 
                 boolean isPast = res.getDateTime().isBefore(java.time.LocalDateTime.now());
-
-                // ✅ comparație sigură: pe baza ID-ului, nu pe obiect
                 boolean hasJoined = res.getParticipants().stream()
                         .anyMatch(p -> p.getId().equals(user.getId()));
 
-                // 🔥 Șterge notificarea dacă e în trecut SAU userul a acceptat deja
                 if (isPast || hasJoined) {
-                    toDelete.add(n);
+                    n.setDeleted(true);
+                    toMarkDeleted.add(n);
                 }
             }
         }
 
-        notificationRepository.deleteAll(toDelete);
-        return ResponseEntity.ok("Notificările expirate sau acceptate au fost șterse.");
+        notificationRepository.saveAll(toMarkDeleted);
+        return ResponseEntity.ok("Notificările au fost marcate ca șterse.");
     }
 
 

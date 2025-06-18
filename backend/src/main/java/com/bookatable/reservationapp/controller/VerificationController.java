@@ -9,10 +9,13 @@ import com.bookatable.reservationapp.repository.UserRepository;
 import com.bookatable.reservationapp.repository.UserVerificationRepository;
 import com.bookatable.reservationapp.service.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,6 +26,8 @@ import java.util.Optional;
 @RequestMapping("api/verify")
 public class VerificationController {
 
+    @Value("${admin.secret}")
+    private String adminSecret;
     @Autowired
     private VerificationService verificationService;
 
@@ -105,8 +110,6 @@ public class VerificationController {
                 noti.setType("VERIFICATION");
                 noti.setMessage("Your account has been successfully verified.");
                 noti.setTimestamp(LocalDateTime.now());
-
-//  Siguranță: setează ID-ul explicit DOAR dacă este salvat
                 if (verification.getId() != null) {
                     noti.setVerificationId(verification.getId());
                 } else {
@@ -181,7 +184,10 @@ public class VerificationController {
 
     // ✅ Obține toate verificările
     @GetMapping("/all")
-    public ResponseEntity<?> getAllVerifications() {
+    public ResponseEntity<?> getAllVerifications(@RequestHeader("X-ADMIN-CODE") String adminCode) {
+        if (!adminSecret.equals(adminCode)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cod admin invalid");
+        }
         return ResponseEntity.ok(verificationRepository.findAll());
     }
 }

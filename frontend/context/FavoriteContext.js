@@ -64,12 +64,12 @@ export const FavoriteProvider = ({ children }) => {
     }
   };
 
-  // Logout curat
+  
   const logout = async () => {
     await AsyncStorage.removeItem('userId');
     setUserId(null);
     setFavorites([]);
-    console.log('🚪 Logout – userId și favorite resetate');
+    console.log(' Logout – userId și favorite resetate');
   };
 
   return (

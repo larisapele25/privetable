@@ -57,7 +57,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      await logout(); // din FavoriteContext
+      await logout(); 
       navigation.reset({
         index: 0,
         routes: [{ name: 'Login' }],

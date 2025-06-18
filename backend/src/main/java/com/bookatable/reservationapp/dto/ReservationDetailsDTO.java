@@ -8,14 +8,16 @@ public class ReservationDetailsDTO {
     private int numberOfPeople;
     private int duration;
     private Long createdById;
+    private Long id;
 
 
-    public ReservationDetailsDTO(String restaurantName, LocalDateTime dateTime, int numberOfPeople, int duration, Long createdById) {
+    public ReservationDetailsDTO(String restaurantName, LocalDateTime dateTime, int numberOfPeople, int duration, Long createdById, Long id) {
         this.restaurantName = restaurantName;
         this.dateTime = dateTime;
         this.numberOfPeople = numberOfPeople;
         this.duration = duration;
         this.createdById = createdById;
+        this.id = id;
     }
 
 
@@ -54,5 +56,10 @@ public class ReservationDetailsDTO {
     public void setCreatedById(Long createdById) {
         this.createdById = createdById;
     }
-
+public Long getId() {
+        return id;
+}
+public void setId(Long id) {
+        this.id = id;
+}
 }

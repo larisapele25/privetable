@@ -36,12 +36,10 @@ public class AdminController {
             @RequestBody Restaurant restaurant
     ) {
         if (!adminSecret.equals(adminCode)) {
-            return ResponseEntity.status(403).body("Cod de acces invalid.");
+            return ResponseEntity.status(403).body("Invalid admin code.");
         }
-
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
         RestaurantAccount account = restaurantAccountService.createAccount(savedRestaurant);
-
         RestaurantInfoDTO dto = new RestaurantInfoDTO(
                 savedRestaurant.getId(),
                 savedRestaurant.getCapacity(),
@@ -50,9 +48,7 @@ public class AdminController {
                 account.getLoginCode()
 
         );
-
-        System.out.println("Parola generată: (este în consolă)");
-
+        System.out.println("Parola generată: (în consolă)");
         return ResponseEntity.ok(dto);
     }
 
@@ -71,7 +67,7 @@ public class AdminController {
             @RequestHeader("X-ADMIN-CODE") String adminCode
     ) {
         if (!adminSecret.equals(adminCode)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cod invalid");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid admin code.");
         }
 
         return restaurantAccountService.getAllWithLoginCodes();

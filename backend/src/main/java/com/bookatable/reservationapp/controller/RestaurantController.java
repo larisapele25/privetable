@@ -1,19 +1,15 @@
 package com.bookatable.reservationapp.controller;
 
+import com.bookatable.reservationapp.dto.RestaurantWithRatingDTO;
 import com.bookatable.reservationapp.model.Restaurant;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.repository.RestaurantRepository;
 import com.bookatable.reservationapp.repository.UserRepository;
 import com.bookatable.reservationapp.service.RestaurantService;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,8 +45,8 @@ public class RestaurantController {
     }
 
     @GetMapping("/all")
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantRepository.findAll();
+    public List<RestaurantWithRatingDTO> getAllRestaurants() {
+        return restaurantRepository.findAllWithAverageRating();
     }
 
     public record RestaurantDTO(Long id, String name, String imageUrl) {
@@ -58,7 +54,4 @@ public class RestaurantController {
             return new RestaurantDTO(r.getId(), r.getName(), r.getImageUrl());
         }
     }
-
-
-
 }

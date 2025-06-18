@@ -2,6 +2,8 @@ package com.bookatable.reservationapp.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "restaurants")
 public class Restaurant {
@@ -15,6 +17,9 @@ public class Restaurant {
     private String imageUrl;
 
     private int capacity;
+    @OneToMany(mappedBy = "restaurant")
+    private List<Review> reviews;
+
 
     public Restaurant() {}
 
@@ -53,5 +58,12 @@ public class Restaurant {
     }
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

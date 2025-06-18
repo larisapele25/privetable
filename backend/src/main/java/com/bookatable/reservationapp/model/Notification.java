@@ -30,6 +30,8 @@ public class Notification {
     @JsonIgnoreProperties({"verifications", "notifications", "password", "resetCode", "resetCodeTimestamp"})
     private User recipient;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
 
 
     public Notification() {}
@@ -94,4 +96,10 @@ public class Notification {
         this.restaurantId = restaurantId;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

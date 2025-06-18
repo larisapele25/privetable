@@ -34,8 +34,6 @@ public class RestaurantAccountService {
         account.setPasswordHash(hashedPassword);
 
         restaurantAccountRepository.save(account);
-
-        // Parola afișată în consolă — doar pentru dezvoltare/demo
         System.out.println("Login code: " + loginCode + " | Password: " + rawPassword);
 
         return account;

@@ -70,7 +70,6 @@ const VerificationScreen = ({ navigation }) => {
     }
 
     const formData = new FormData();
-
     formData.append("userId", userId.toString());
     formData.append("name", name);
     formData.append("surname", surname);

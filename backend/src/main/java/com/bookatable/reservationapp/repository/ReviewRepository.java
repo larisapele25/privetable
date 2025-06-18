@@ -1,6 +1,7 @@
 package com.bookatable.reservationapp.repository;
 
 import com.bookatable.reservationapp.model.Review;
+import com.bookatable.reservationapp.model.UserReviewByRestaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByUserIdAndReservationId(Long userId, Long reservationId);
 
     boolean existsByUserIdAndReservationId(Long userId, Long reservationId);
+
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.bookatable.reservationapp.controller;
 
+import com.bookatable.reservationapp.dto.ReviewWithUserEmailDTO;
 import com.bookatable.reservationapp.model.*;
 import com.bookatable.reservationapp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class ReviewController {
             User user = userOpt.get();
             Reservation reservation = resOpt.get();
 
-            // 🔐 Verificare participare
+            //  Verificare participare
             boolean isCreator = reservation.getUser().getId().equals(userId);
             boolean isParticipant = reservation.getParticipants().stream()
                     .anyMatch(p -> p.getId().equals(userId));
@@ -47,12 +48,12 @@ public class ReviewController {
                 return ResponseEntity.status(403).body("You did not participate in this reservation.");
             }
 
-            // ⏳ Verificare dacă rezervarea este în trecut
+            // Verificare dacă rezervarea este în trecut
             if (reservation.getDateTime().isAfter(LocalDateTime.now())) {
                 return ResponseEntity.badRequest().body("You cannot leave a review for a future booking.");
             }
 
-            // 🔁 Prevenire review dublu
+            // Prevenire review dublu
             boolean alreadyReviewed = reviewRepository.findByUserId(userId).stream()
                     .anyMatch(r -> r.getReservation().getId().equals(reservationId));
 
@@ -60,7 +61,7 @@ public class ReviewController {
                 return ResponseEntity.badRequest().body("You have already submitted a review for this reservation.");
             }
 
-            // ✅ Creare review
+            //  Creare review
             Review review = new Review();
             review.setUser(user);
             review.setRestaurant(restOpt.get());
@@ -77,29 +78,22 @@ public class ReviewController {
 
 
 
-    @GetMapping("/restaurant/{id}")
-    public ResponseEntity<List<Map<String, Object>>> getReviewsForRestaurant(@PathVariable Long id) {
-        List<Review> reviews = reviewRepository.findByRestaurantId(id);
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<List<ReviewWithUserEmailDTO>> getReviewsForRestaurant(@PathVariable Long restaurantId) {
+        List<Review> reviews = reviewRepository.findByRestaurantId(restaurantId);
 
-        List<Map<String, Object>> result = reviews.stream().map(review -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("rating", review.getRating());
-            map.put("comment", review.getComment());
-
-            // 👇 Adăugăm doar ce trebuie
-            if (review.getUser() != null) {
-                map.put("userId", review.getUser().getId());
-            }
-
-            if (review.getReservation() != null) {
-                map.put("reservationDateTime", review.getReservation().getDateTime());
-            }
-
-            return map;
+        List<ReviewWithUserEmailDTO> result = reviews.stream().map(review -> {
+            ReviewWithUserEmailDTO dto = new ReviewWithUserEmailDTO();
+            dto.setRating(review.getRating());
+            dto.setComment(review.getComment());
+            dto.setUserEmail(review.getUser().getEmail());
+            dto.setReservationDateTime(review.getReservation().getDateTime());
+            return dto;
         }).toList();
 
         return ResponseEntity.ok(result);
     }
+
 
 
 }

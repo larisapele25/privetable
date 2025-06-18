@@ -10,7 +10,7 @@ import { FavoriteContext } from '../context/FavoriteContext';
 import { useNavigation } from '@react-navigation/native';
 import { Swipeable } from 'react-native-gesture-handler';
 
-// Enable LayoutAnimation on Android
+
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -38,7 +38,7 @@ const NotificationsScreen = () => {
       if (!finalUserId) return;
 
       try {
-        await API.delete(`/notifications/cleanup/${finalUserId}`);
+       await API.put(`/notifications/cleanup/${finalUserId}`);
         await API.put(`/notifications/mark-as-read/${finalUserId}`);
 
         const [notiRes, reservationsRes] = await Promise.all([

@@ -50,40 +50,46 @@ const ChooseRestaurantScreen = ({ navigation }) => {
     r.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const renderRestaurant = ({ item }) => {
-    const isFavorite = favorites.includes(item.id);
+ const renderRestaurant = ({ item }) => {
+  const isFavorite = favorites.includes(item.id);
 
-    return (
-      <TouchableOpacity
-        style={[
-          styles.card,
-          selectedRestaurant?.id === item.id && styles.selectedCard,
-        ]}
-        onPress={() => setSelectedRestaurant(item)}
-      >
-        <Image
-          source={{ uri: item.imageUrl }}
-          style={styles.image}
-          onError={() => console.log(`Image failed: ${item.imageUrl}`)}
-        />
-        <View style={styles.cardFooter}>
+  return (
+    <TouchableOpacity
+      style={[
+        styles.card,
+        selectedRestaurant?.id === item.id && styles.selectedCard,
+      ]}
+      onPress={() => setSelectedRestaurant(item)}
+    >
+      <Image
+        source={{ uri: item.imageUrl }}
+        style={styles.image}
+        onError={() => console.log(`Image failed: ${item.imageUrl}`)}
+      />
+      <View style={styles.cardFooter}>
+        <View>
           <Text style={styles.name}>{item.name}</Text>
-          <TouchableOpacity
-            onPress={(e) => {
-              e.stopPropagation(); // prevenim propagarea către card
-              toggleFavorite(item.id);
-            }}
-          >
-            <Icon
-              name={isFavorite ? 'heart' : 'heart-outline'}
-              size={24}
-              color="#f00"
-            />
-          </TouchableOpacity>
+          <Text style={styles.rating}>
+            {item.averageRating ? `${item.averageRating.toFixed(1)}/5` : 'No reviews yet'}
+          </Text>
         </View>
-      </TouchableOpacity>
-    );
-  };
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation();
+            toggleFavorite(item.id);
+          }}
+        >
+          <Icon
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={24}
+            color="#f00"
+          />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 
   if (loading) {
     return (
@@ -198,4 +204,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  rating: {
+  fontSize: 14,
+  color: '#555',
+  marginTop: 4,
+},
 });

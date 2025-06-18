@@ -35,8 +35,13 @@ export default function RestaurantDashboard({ navigation }) {
         endpoint = `/api/restaurant/reservations/by-date?date=${dateStr}`;
       } else if (selectedTab === 'orders') {
         endpoint = `/api/restaurant/orders/by-date?date=${dateStr}`;
-      } else {
+      } else if (selectedTab === 'reviews') {
         endpoint = `/api/reviews/restaurant/${restaurantId}`;
+        } else if (selectedTab === 'user-history') {
+        endpoint = `/api/restaurant/user-history`;
+        }
+       else {
+        endpoint = `/api/restaurant/reservations/past`;
       }
 
       const response = await fetch(`http://192.168.0.234:8080${endpoint}`, {
@@ -58,10 +63,7 @@ export default function RestaurantDashboard({ navigation }) {
       await AsyncStorage.removeItem('token');
       await AsyncStorage.removeItem('restaurantId');
       await AsyncStorage.removeItem('restaurantName');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
     } catch {
       Alert.alert('Eroare la logout');
     }
@@ -75,27 +77,26 @@ export default function RestaurantDashboard({ navigation }) {
       return (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>⏰ {time} | {item.numberOfPeople} persons</Text>
-          {item.createdById && (
-            <Text style={styles.cardDetail}>🧾 Reserved by ID: {item.createdById}</Text>
-          )}
-          <Text style={styles.cardDetail}>⏳ Duration: {item.duration} hours</Text>
+          <Text style={styles.cardDetail}>📄 Reservation ID: {item.id}</Text>
+          <Text style={styles.cardDetail}>🧾 Created by ID: {item.createdById}</Text>
+          <Text style={styles.cardDetail}>⏳ Duration: {item.duration}h</Text>
+
+  
         </View>
       );
     }
 
-    if (selectedTab === 'orders') {
-      const product = item.product || {};
-      return (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>🍽️ {product.name || 'Unknown product'}</Text>
-          <Text style={styles.cardDetail}>🔢 Quantity: {item.quantity}</Text>
-          {product.price != null && (
-            <Text style={styles.cardDetail}>💸 {product.price} RON</Text>
-          )}
-          <Text style={styles.cardDetail}>🪪 ID reservation: {item.reservationId}</Text>
-        </View>
-      );
-    }
+   if (selectedTab === 'orders') {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.cardTitle}>🍽️ {item.productName || 'Unknown product'}</Text>
+      <Text style={styles.cardDetail}>🔢 Quantity: {item.quantity}</Text>
+      <Text style={styles.cardDetail}>🪪 Reservation ID: {item.reservationId}</Text>
+      <Text style={styles.cardDetail}>👤 Ordered by ID: {item.userId}</Text>
+    </View>
+  );
+}
+
 
     if (selectedTab === 'reviews') {
       const stars = '⭐'.repeat(item.rating);
@@ -107,8 +108,58 @@ export default function RestaurantDashboard({ navigation }) {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{stars} ({item.rating}/5)</Text>
           <Text style={styles.cardDetail}>{item.comment || '(No comment)'}</Text>
-          <Text style={styles.cardDetail}>👤 User ID: {item.userId ?? 'unknown'}</Text>
+         <Text style={styles.cardDetail}>📧 Email: {item.userEmail ?? 'unknown'}</Text>
           <Text style={styles.cardDetail}>📅 {date}</Text>
+        </View>
+      );
+    }
+
+    if (selectedTab === 'user-history') {
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        navigation.navigate('UserReviewHistory', {
+          userId: item.id,
+          userEmail: item.email
+        })
+      }
+    >
+      <Text style={styles.cardTitle}>👤 {item.name}</Text>
+      <Text style={styles.cardDetail}>📧 {item.email}</Text>
+       <Text style={styles.cardDetail}>User ID: {item.id}</Text>
+    </TouchableOpacity>
+  );
+}
+
+
+    if (selectedTab === 'past-reservations') {
+      return (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>📅 Reservation no.{item.id}</Text>
+          <Text style={styles.cardDetail}>👤 Creator: {item.userEmail}</Text>
+          {item.participantEmails?.length > 0 && (
+            <Text style={styles.cardDetail}>
+              👥 Participants: {item.participantEmails.join(', ')}
+            </Text>
+          )}
+
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 10 }]}
+            onPress={() => navigation.navigate('LeaveReviewScreen', {
+              reservationId: item.id,
+             userList: [
+  { id: item.userId, email: item.userEmail },
+  ...(item.participantIds || []).map((id, i) => ({
+    id,
+    email: item.participantEmails[i]
+  }))
+]
+
+            })}
+          >
+            <Text style={styles.buttonText}>Leave a review</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -128,20 +179,27 @@ export default function RestaurantDashboard({ navigation }) {
       </TouchableOpacity>
 
       <View style={styles.tabContainer}>
-        {['reservations', 'orders', 'reviews'].map(tab => (
+        {['reservations', 'orders', 'reviews', 'past-reservations','user-history'].map(tab => (
           <TouchableOpacity
             key={tab}
             style={[styles.tab, selectedTab === tab && styles.activeTab]}
             onPress={() => setSelectedTab(tab)}
           >
             <Text style={selectedTab === tab ? styles.activeTabText : styles.tabText}>
-              {tab === 'reservations' ? 'Reservations' : tab === 'orders' ? 'Orders' : 'Reviews'}
+              {{
+                  reservations: 'Reservations',
+                  orders: 'Orders',
+                  reviews: 'Reviews',
+                  'past-reservations': 'Past Reservations',
+                  'user-history': 'User History'
+              }[tab]}
+
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {selectedTab !== 'reviews' && (
+      {['reservations', 'orders'].includes(selectedTab) && (
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
           <Text style={styles.dateText}>{selectedDate.toLocaleDateString()}</Text>
         </TouchableOpacity>
@@ -207,14 +265,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 12,
+    flexWrap: 'wrap',
   },
   tab: {
     paddingVertical: 10,
     paddingHorizontal: 24,
-    marginHorizontal: 8,
+    margin: 4,
     borderRadius: 24,
     backgroundColor: '#eee',
-    marginTop: 16
   },
   activeTab: {
     backgroundColor: '#000',
@@ -263,6 +321,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
+  },
+  button: {
+    backgroundColor: '#222',
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '600',
   },
   emptyText: {
     textAlign: 'center',

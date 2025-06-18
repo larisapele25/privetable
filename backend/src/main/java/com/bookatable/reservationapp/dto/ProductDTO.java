@@ -11,6 +11,7 @@ public class ProductDTO {
     private LocalDateTime createdAt;
 
 
+
     public ProductDTO(Long id, String name, String description, Double price, String category, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
@@ -18,6 +19,7 @@ public class ProductDTO {
         this.price = price;
         this.category = category;
         this.createdAt = createdAt;
+
     }
 
 
@@ -33,4 +35,5 @@ public class ProductDTO {
     public void setCategory(String category) { this.category = category; }
 public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
 }

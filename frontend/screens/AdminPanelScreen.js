@@ -10,7 +10,7 @@ export default function AdminPanelScreen() {
   const { adminCode } = route.params;
 
   const handleLogout = () => {
-    Alert.alert('Confirmation', 'Are you sure you want to log out?', [
+    Alert.alert('Confirmation', 'Are you sure you want to logout?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Logout',
@@ -43,7 +43,7 @@ export default function AdminPanelScreen() {
         </TouchableOpacity>
     <TouchableOpacity
         style={styles.smallButton}
-        onPress={() => navigation.navigate('VerificationAdmin')}>
+        onPress={() => navigation.navigate('VerificationAdmin', { adminCode })}>
     <Text style={styles.buttonText}>🔍 User Verification</Text>
     </TouchableOpacity>
 

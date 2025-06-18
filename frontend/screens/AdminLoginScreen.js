@@ -15,12 +15,9 @@ export default function AdminLoginScreen() {
     }
 
     try {
-      // testăm cu un request HEAD (sau GET simplu) către un endpoint protejat
       await API.get('/restaurants/all', {
         headers: { 'X-ADMIN-CODE': adminCode }
       });
-
-      // ✅ Navigăm către ecranul de admin
       navigation.navigate('AdminPanel', { adminCode });
 
     } catch (err) {

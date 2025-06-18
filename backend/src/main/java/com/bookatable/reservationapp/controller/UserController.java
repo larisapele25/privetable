@@ -85,8 +85,6 @@ import java.util.Set;
         }
 
         User user = userOptional.get();
-
-        // Folosești metoda adăugată acum
         if (!authService.checkPassword(user, request.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
         }
@@ -99,7 +97,6 @@ import java.util.Set;
             return ResponseEntity.badRequest().body("Email address is incorrect.");
         }
 
-        // Salvezi noul email
         user.setEmail(request.getNewEmail());
         userRepository.save(user);
 

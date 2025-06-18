@@ -113,7 +113,9 @@ public class CartItemService {
                         item.getProduct().getName(),
                         item.getQuantity(),
                         item.getUser().getFirstName() + " " + item.getUser().getLastName(),
-                        item.getAddedAt()
+                        item.getAddedAt(),
+                        item.getReservation().getId(),
+                        item.getUser().getId()
                 ))
                 .toList();
     }

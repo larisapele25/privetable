@@ -1,6 +1,7 @@
 package com.bookatable.reservationapp.service;
 
 import com.bookatable.reservationapp.dto.ReservationDetailsDTO;
+import com.bookatable.reservationapp.dto.UserDTO;
 import com.bookatable.reservationapp.model.Reservation;
 import com.bookatable.reservationapp.model.Restaurant;
 import com.bookatable.reservationapp.model.User;
@@ -40,7 +41,8 @@ public class ReservationService {
                     res.getDateTime(),
                     res.getNumberOfPeople(),
                     res.getDuration(),
-                    res.getUser().getId()
+                    res.getUser().getId(),
+                    res.getId()
             );
         } else {
             throw new RuntimeException("Reservation not found");
@@ -83,6 +85,19 @@ public class ReservationService {
     public List<Reservation> getPastReservations(User user) {
         return reservationRepository.findByUserAndDateTimeBefore(user, LocalDateTime.now());
     }
+
+    public List<UserDTO> getAllUsersFromReservations(Long restaurantId) {
+        List<Reservation> reservations = reservationRepository.findByRestaurantId(restaurantId);
+        Set<User> uniqueUsers = new HashSet<>();
+
+        for (Reservation res : reservations) {
+            if (res.getUser() != null) uniqueUsers.add(res.getUser());
+            if (res.getParticipants() != null) uniqueUsers.addAll(res.getParticipants());
+        }
+
+        return uniqueUsers.stream().map(UserDTO::from).toList(); // map to id + email
+    }
+
 
 
 
@@ -184,7 +199,7 @@ public class ReservationService {
             }
         }
 
-        // 🔁 2. Verificare capacitate pentru restaurant (așa cum aveai deja)
+        // 🔁 2. Verificare capacitate pentru restaurant
         List<Reservation> existingReservations = reservationRepository.findByRestaurantIdAndDate(restaurantId, date);
         int MAX_SEATS = 20;
         int seatsTaken = 0;
@@ -203,7 +218,7 @@ public class ReservationService {
             throw new RuntimeException("Not enough seats available at this hour.");
         }
 
-        // ✅ 3. Creează rezervarea
+        // Creează rezervarea
         Reservation reservation = new Reservation(dateTime, user, restaurant, nrPeople, duration);
         reservationRepository.save(reservation);
     }
@@ -245,12 +260,10 @@ public class ReservationService {
         if (reservation.getDateTime().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("The reservation has already passed and cannot be canceled.");
         }
-        if (reservation.getDateTime().minusHours(2).isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("The reservation can only be canceled at least 2 hours in advance.");
+        if (reservation.getDateTime().minusHours(1).isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("The reservation can only be canceled at least one hour in advance.");
         }
-
-
-        // aici poți avea și un câmp status (ex: "CANCELLED"), dar pentru simplitate:
+        
         reservationRepository.delete(reservation);
     }
 
@@ -267,7 +280,8 @@ public class ReservationService {
                         res.getDateTime(),
                         res.getNumberOfPeople(),
                         res.getDuration(),
-                        res.getUser().getId()
+                        res.getUser().getId(),
+                        res.getId()
                 ))
                 .toList();
     }
@@ -278,7 +292,8 @@ public class ReservationService {
                         res.getDateTime(),
                         res.getNumberOfPeople(),
                         res.getDuration(),
-                        res.getUser().getId()
+                        res.getUser().getId(),
+                        res.getId()
                 )).toList();
     }
 

@@ -1,5 +1,7 @@
 package com.bookatable.reservationapp.dto;
 
+import com.bookatable.reservationapp.model.User;
+
 public class UserDTO {
     private Long id;
     private String name;
@@ -11,6 +13,10 @@ public class UserDTO {
         this.name = name;
         this.email = email;
         this.verified = verified;
+    }
+
+    public static UserDTO from(User user) {
+        return new UserDTO(user.getId(), user.getFirstName(),user.getEmail(),  user.isVerified());
     }
 
     // Getters

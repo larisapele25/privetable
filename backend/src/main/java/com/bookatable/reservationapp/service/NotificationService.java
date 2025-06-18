@@ -34,11 +34,11 @@ public class NotificationService {
         this.productRepository = productRepository;
     }
 
-    @Scheduled(cron = "0 0 15 */3 * *") // Rulează la ora 15:00 o dată la 3 zile
+    @Scheduled(cron = "0 0 15 */3 * *")
     public void sendReengagementNotifications() {
-        System.out.println("⏰ Jobul de reengagement rulează");
+        System.out.println(" Jobul de reengagement rulează");
 
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllWithFavorites();
         int count = 0;
 
         for (User user : users) {

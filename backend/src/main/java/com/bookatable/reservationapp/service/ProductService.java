@@ -44,8 +44,8 @@ public class ProductService {
                                         p.getName(),
                                         p.getDescription(),
                                         p.getPrice(),
-                        p.getCategory(),
-                        p.getCreatedAt()))
+                                        p.getCategory(),
+                                        p.getCreatedAt()))
                 .toList();
     }
 

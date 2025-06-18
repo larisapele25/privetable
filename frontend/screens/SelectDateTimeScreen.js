@@ -14,7 +14,7 @@ import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '../services/api';
 
-// … importuri neschimbate …
+
 
 const SelectDateTimeScreen = ({ route }) => {
   const { restaurant } = route.params;

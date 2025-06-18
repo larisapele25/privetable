@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FavoriteContext } from '../context/FavoriteContext';
-import { API } from '../services/api'; // poate fi folosit pentru detalii extra dacă vrei
+import { API } from '../services/api'; 
 import { useFocusEffect } from '@react-navigation/native';
 
 const FavoritesScreen = () => {

@@ -21,7 +21,7 @@ public class EmailService {
     }
 
     public void sendReservationReminderEmail(String to, String name, String restaurant, String time) {
-        System.out.println("🔔 Trimit reminder către: " + to);
+        System.out.println(" Trimit reminder către: " + to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Reservation reminder - PrivéTable");
@@ -43,7 +43,7 @@ public class EmailService {
         message.setText(
                 "Hi " + name + ",\n\n" +
                         "We are glad you chose PrivéTable services!\n" +
-                        "You had a reservation at " + restaurantName + "and we would love to know how it was.\n\n" +
+                        "You had a reservation at " + restaurantName + " and we would love to know how it was.\n\n" +
                         "Open the PrivéTable app and leave us a review.\n\n" +
                         "Thank you for being with us!\n" +
                         "PrivéTable Team "
@@ -52,5 +52,25 @@ public class EmailService {
         mailSender.send(message);
         System.out.println("📤 Email trimis cu succes către: " + to);
     }
+
+    public void sendReviewReceivedEmail(String to, String userName, String restaurantName, int rating, String comment) {
+        System.out.println("📨 Trimit email de review primit către: " + to);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Ai primit un review nou de la " + restaurantName + " 📝");
+        message.setText(
+                "Salut " + userName + ",\n\n" +
+                        "Ai primit un review nou din partea restaurantului " + restaurantName + ":\n\n" +
+                        "⭐ Rating: " + rating + " stele\n" +
+                        "💬 Comentariu: " + (comment != null && !comment.isEmpty() ? comment : "(fără comentariu)") + "\n\n" +
+                        "Ne bucurăm că folosești PrivéTable!\n\n" +
+                        "Echipa PrivéTable"
+        );
+
+        mailSender.send(message);
+        System.out.println("📤 Email de review trimis către: " + to);
+    }
+
 
 }

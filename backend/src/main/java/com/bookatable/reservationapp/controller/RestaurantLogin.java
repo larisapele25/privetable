@@ -48,6 +48,7 @@ private final RestaurantRepository restaurantRepository;
 
         return ResponseEntity.ok(new RestaurantLoginResponse(token, account.getRestaurant().getId(),account.getRestaurant().getName()));
     }
+
     @PostMapping("/generate-account/{restaurantId}")
     public ResponseEntity<?> generateAccountForRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)

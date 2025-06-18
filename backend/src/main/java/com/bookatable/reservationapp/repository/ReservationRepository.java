@@ -40,6 +40,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("restaurantId") Long restaurantId,
             @Param("date") LocalDate date
     );
+    List<Reservation> findByRestaurantIdAndDateTimeBefore(Long restaurantId, LocalDateTime time);
 
 
 }
