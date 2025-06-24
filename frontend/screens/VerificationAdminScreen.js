@@ -54,7 +54,7 @@ const VerificationAdminScreen = () => {
   const getImageUrl = (fullPath) => {
     if (!fullPath) return '';
     const filename = fullPath.split(/[\\/]/).pop();
-    return `http://192.168.0.234:8080/uploads/${filename}`;
+    return `http://192.168.0.150:8080/uploads/${filename}`;
   };
 
   return (

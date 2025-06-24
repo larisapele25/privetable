@@ -13,7 +13,7 @@ export default function UserReviewHistory({ route, navigation }) {
   const fetchReviews = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.168.0.234:8080/api/reviews/about-user/${userId}`, {
+      const response = await fetch(`http://192.168.0.150:8080/api/reviews/about-user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

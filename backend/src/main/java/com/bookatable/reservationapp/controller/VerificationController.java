@@ -1,6 +1,7 @@
 package com.bookatable.reservationapp.controller;
 
 import com.bookatable.reservationapp.dto.VerificationRequestDTO;
+import com.bookatable.reservationapp.dto.VerificationResponseDTO;
 import com.bookatable.reservationapp.model.Notification;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.model.UserVerification;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +42,7 @@ public class VerificationController {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    // ✅ Submit cerere de verificare
+    //  Submit cerere de verificare
     @PostMapping("/submit")
     public ResponseEntity<String> manualVerificationSubmit(
             @RequestParam("userId") Long userId,
@@ -74,7 +76,7 @@ public class VerificationController {
 
             UserVerification saved = verificationService.submitVerification(dto);
 
-            // 🔔 Notificare: verificare în curs
+            //  Notificare: verificare în curs
             Notification noti = new Notification();
             noti.setRecipient(userOpt.get());
             noti.setType("VERIFICATION");
@@ -92,7 +94,7 @@ public class VerificationController {
         }
     }
 
-    // ✅ Aprobă cererea
+    //  Aprobă cererea
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approve(@PathVariable Long id) {
         return verificationRepository.findById(id).map(verification -> {
@@ -123,7 +125,7 @@ public class VerificationController {
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID inexistent."));
     }
 
-    // ✅ Respinge cererea
+    //  Respinge cererea
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> reject(@PathVariable Long id, @RequestParam(required = false) String comment) {
         return verificationRepository.findById(id).map(verification -> {
@@ -182,12 +184,26 @@ public class VerificationController {
 
 
 
-    // ✅ Obține toate verificările
+    //  Obține toate verificările
     @GetMapping("/all")
-    public ResponseEntity<?> getAllVerifications(@RequestHeader("X-ADMIN-CODE") String adminCode) {
+    public ResponseEntity<List<VerificationResponseDTO>> getAllVerifications(
+            @RequestHeader("X-ADMIN-CODE") String adminCode) {
+
+        // ✅ Verifică codul secret admin:
         if (!adminSecret.equals(adminCode)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cod admin invalid");
         }
-        return ResponseEntity.ok(verificationRepository.findAll());
+
+        // ✅ Ia toate entitățile:
+        List<UserVerification> verifications = verificationRepository.findAll();
+
+        // ✅ Transformă în DTO-uri:
+        List<VerificationResponseDTO> dtoList = verifications.stream()
+                .map(VerificationResponseDTO::new)
+                .toList();
+
+        // ✅ Returnează lista de DTO-uri:
+        return ResponseEntity.ok(dtoList);
     }
+
 }

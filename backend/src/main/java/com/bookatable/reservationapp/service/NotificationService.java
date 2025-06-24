@@ -33,6 +33,10 @@ public class NotificationService {
         this.restaurantRepository = restaurantRepository;
         this.productRepository = productRepository;
     }
+    public List<Notification> getForUser(Long userId) {
+        return notificationRepository.findByRecipientIdAndDeletedFalseOrderByTimestampDesc(userId);
+    }
+
 
     @Scheduled(cron = "0 0 15 */3 * *")
     public void sendReengagementNotifications() {

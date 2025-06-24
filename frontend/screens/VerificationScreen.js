@@ -87,7 +87,7 @@ const VerificationScreen = ({ navigation }) => {
     });
 
     try {
-      const response = await fetch("http://192.168.0.234:8080/api/verify/submit", {
+      const response = await fetch("http://192.168.0.150:8080/api/verify/submit", {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',

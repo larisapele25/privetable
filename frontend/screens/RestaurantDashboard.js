@@ -44,7 +44,7 @@ export default function RestaurantDashboard({ navigation }) {
         endpoint = `/api/restaurant/reservations/past`;
       }
 
-      const response = await fetch(`http://192.168.0.234:8080${endpoint}`, {
+      const response = await fetch(`http://192.168.0.150:8080${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -12,7 +12,7 @@ export default function RestaurantLoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.234:8080/api/restaurant/login', {
+      const response = await fetch('http://192.168.0.150:8080/api/restaurant/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loginCode, password }),

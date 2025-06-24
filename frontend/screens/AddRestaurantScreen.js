@@ -32,7 +32,7 @@ export default function AddRestaurantScreen({ route }) {
 
     try {
       const res = await axios.post(
-        'http://192.168.0.234:8080/api/admin/add-restaurant',
+        'http://192.168.0.150:8080/api/admin/add-restaurant',
         {
           name,
           imageUrl,

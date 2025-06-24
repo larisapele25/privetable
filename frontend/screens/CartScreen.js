@@ -14,12 +14,17 @@ const CartScreen = () => {
   const { userId } = useContext(FavoriteContext);
 
   const fetchCartItems = () => {
-    API.get(`/cart/reservation/${reservationId}`)
-      .then(response => setCartItems(response.data))
-      .catch(error => {
-        console.error('Error fetching cart items:', error);
-      });
-  };
+  API.get(`/cart/reservation/${reservationId}`)
+    .then(response => {
+      console.log("Cart items response:", response.data);
+      setCartItems(response.data);  //  răspunsul e lista DTO directă
+    })
+    .catch(error => {
+      console.error('Error fetching cart items:', error);
+      setCartItems([]); // fallback dacă e eroare
+    });
+};
+
 
   useEffect(() => {
     fetchCartItems();

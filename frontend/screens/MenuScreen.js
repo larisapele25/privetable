@@ -7,7 +7,7 @@ import { FavoriteContext } from '../context/FavoriteContext';
 const MenuScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { reservationId, restaurantId, readOnly } = route.params; // ✅ citim readOnly
+  const { reservationId, restaurantId, readOnly } = route.params; //  citim readOnly
   const { userId } = useContext(FavoriteContext);
 
   const [products, setProducts] = useState([]);
@@ -23,7 +23,7 @@ const MenuScreen = () => {
   }, [restaurantId]);
 
   const addToCart = (product) => {
-    if (readOnly) return; // ✅ prevenim acțiunea în mod read-only
+    if (readOnly) return; //  prevenim acțiunea în mod read-only
     const updatedCart = { ...cart };
     updatedCart[product.id] = updatedCart[product.id]
       ? { ...product, quantity: updatedCart[product.id].quantity + 1 }
@@ -33,7 +33,7 @@ const MenuScreen = () => {
   };
 
   const removeFromCart = (product) => {
-    if (readOnly) return; // ✅ prevenim acțiunea în mod read-only
+    if (readOnly) return; //  prevenim acțiunea în mod read-only
     const updatedCart = { ...cart };
     if (updatedCart[product.id]) {
       updatedCart[product.id].quantity -= 1;
@@ -61,8 +61,12 @@ const MenuScreen = () => {
 
   const grouped = groupByCategory(products);
 
+console.log("reservationId:", reservationId);
+console.log("userId:", userId);
+console.log("cart:", cart);
+
   const handlePlaceOrder = async () => {
-    if (readOnly) return; // ✅ nici să nu poți trimite comanda
+    if (readOnly) return; //  nu poți trimite comanda
     try {
       if (!userId || !reservationId || Object.keys(cart).length === 0) {
         Alert.alert("Missing data", "Make sure you selected products and are logged in.");

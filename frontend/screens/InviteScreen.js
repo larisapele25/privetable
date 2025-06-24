@@ -9,30 +9,32 @@ const InviteScreen = ({ route }) => {
   const [message, setMessage] = useState('');
 
   const checkUser = async () => {
-    try {
-      const response = await API.get('/users/find-by-email', {
-        params: { email }
-      });
-      setUserFound(true);
-      setMessage(`Inviting ${response.data.firstName || response.data.email}`);
-    } catch (err) {
-      setUserFound(false);
-      setMessage('Acest utilizator nu există');
-    }
-  };
+  try {
+    const response = await API.get('/users/find-by-email', {
+      params: { email }
+    });
+    const foundName = response.data.inviting || response.data.email;
+    setUserFound(true);
+    setMessage(`Inviting ${foundName}`);
+  } catch (err) {
+    setUserFound(false);
+    setMessage('This user does not exist.');
+  }
+};
+
   const sendInvite = async () => {
     try {
       const response = await API.post('/invitations', {
         email: email,
         reservationId: reservationId,
       });
-      setMessage('Invitația a fost trimisă!');
+      setMessage('Invitation was sent!');
     } catch (err) {
-      const errorMsg = err.response?.data || 'A apărut o eroare la trimiterea invitației.';
+      const errorMsg = err.response?.data || 'An error occurred while sending the invitation.';
       setMessage(errorMsg);
   
-      if (errorMsg === 'Limită de participanți atinsă') {
-        Alert.alert("Limita atinsă", "Nu mai poți trimite invitații pentru această rezervare.");
+      if (errorMsg === 'Participant limit reached') {
+        Alert.alert("Limit reached.You can no longer send invitations for this reservation.");
         setUserFound(false); // dezactivează butonul
       }
     }
@@ -61,7 +63,7 @@ const InviteScreen = ({ route }) => {
 
       {message !== '' && <Text style={userFound ? styles.validText : styles.invalidText}>{message}</Text>}
 
-      {userFound && message !== 'Limită de participanți atinsă' && (
+      {userFound && message !== 'Participant limit reached' && (
   <TouchableOpacity style={styles.inviteButton} onPress={sendInvite}>
     <Text style={styles.inviteText}>Send invite</Text>
   </TouchableOpacity>

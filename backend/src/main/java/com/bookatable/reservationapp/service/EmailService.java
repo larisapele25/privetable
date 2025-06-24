@@ -60,12 +60,12 @@ public class EmailService {
         message.setTo(to);
         message.setSubject("Ai primit un review nou de la " + restaurantName + " 📝");
         message.setText(
-                "Salut " + userName + ",\n\n" +
-                        "Ai primit un review nou din partea restaurantului " + restaurantName + ":\n\n" +
-                        "⭐ Rating: " + rating + " stele\n" +
-                        "💬 Comentariu: " + (comment != null && !comment.isEmpty() ? comment : "(fără comentariu)") + "\n\n" +
-                        "Ne bucurăm că folosești PrivéTable!\n\n" +
-                        "Echipa PrivéTable"
+                "Hi " + userName + ",\n\n" +
+                        "You received a new review from the restaurant " + restaurantName + ":\n\n" +
+                        "⭐ Rating: " + rating + " stars\n" +
+                        "💬 Comment: " + (comment != null && !comment.isEmpty() ? comment : "(no comment)") + "\n\n" +
+                        "We're glad you're using PrivéTable!\n\n" +
+                        "PrivéTable Team"
         );
 
         mailSender.send(message);

@@ -17,7 +17,7 @@ export default function ProductManagerScreen({ navigation }) {
   const fetchProducts = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const res = await fetch('http://192.168.0.234:8080/api/restaurant/products', {
+      const res = await fetch('http://192.168.0.150:8080/api/restaurant/products', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Error loading products');
@@ -36,8 +36,8 @@ export default function ProductManagerScreen({ navigation }) {
 
     const token = await AsyncStorage.getItem('token');
     const url = editId
-      ? `http://192.168.0.234:8080/api/restaurant/products/${editId}`
-      : `http://192.168.0.234:8080/api/restaurant/products`;
+      ? `http://192.168.0.150/api/restaurant/products/${editId}`
+      : `http://192.168.0.150:8080/api/restaurant/products`;
 
     const method = editId ? 'PUT' : 'POST';
 

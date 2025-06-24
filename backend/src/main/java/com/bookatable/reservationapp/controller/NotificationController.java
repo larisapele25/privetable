@@ -1,11 +1,13 @@
 package com.bookatable.reservationapp.controller;
 
+import com.bookatable.reservationapp.dto.NotificationDTO;
 import com.bookatable.reservationapp.model.Notification;
 import com.bookatable.reservationapp.model.Reservation;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.repository.NotificationRepository;
 import com.bookatable.reservationapp.repository.ReservationRepository;
 import com.bookatable.reservationapp.repository.UserRepository;
+import com.bookatable.reservationapp.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +27,20 @@ public class NotificationController {
     private ReservationRepository reservationRepository;
 
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/{userId}")
-    public List<Notification> getNotifications(@PathVariable Long userId) {
-        return notificationRepository.findByRecipientIdAndDeletedFalseOrderByTimestampDesc(userId);
+    public ResponseEntity<List<NotificationDTO>> getNotifications(@PathVariable Long userId) {
+        return ResponseEntity.ok(
+                notificationService.getForUser(userId)
+                        .stream()
+                        .map(NotificationDTO::new)
+                        .toList()
+        );
     }
+
 
     @GetMapping("/unread-count/{userId}")
     public ResponseEntity<Integer> getUnreadCount(@PathVariable Long userId) {

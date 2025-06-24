@@ -1,8 +1,6 @@
 package com.bookatable.reservationapp.controller;
 
-import com.bookatable.reservationapp.dto.ChangeEmailRequest;
-import com.bookatable.reservationapp.dto.ChangePasswordRequest;
-import com.bookatable.reservationapp.dto.UserDTO;
+import com.bookatable.reservationapp.dto.*;
 import com.bookatable.reservationapp.model.Restaurant;
 import com.bookatable.reservationapp.model.User;
 import com.bookatable.reservationapp.repository.UserRepository;
@@ -13,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,17 +33,23 @@ import java.util.Set;
     public ResponseEntity<?> findUserByEmail(@RequestParam String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
-            return ResponseEntity.ok((user.get()));
+            return ResponseEntity.ok(new FoundUserDTO(user.get()));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
-        @GetMapping("/{userId}/favorites")
-        public ResponseEntity<Set<Restaurant>> getFavorites(@PathVariable Long userId) {
-            return ResponseEntity.ok(userService.getFavoriteRestaurants(userId));
-        }
 
-        @PostMapping("/{userId}/favorites/{restaurantId}")
+    @GetMapping("/{userId}/favorites")
+    public ResponseEntity<List<FavoriteRestaurantDTO>> getFavorites(@PathVariable Long userId) {
+        Set<Restaurant> favs = userService.getFavoriteRestaurants(userId);
+        List<FavoriteRestaurantDTO> dtos = favs.stream()
+                .map(FavoriteRestaurantDTO::new)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+
+    @PostMapping("/{userId}/favorites/{restaurantId}")
         public ResponseEntity<Void> addFavorite(
                 @PathVariable Long userId,
                 @PathVariable Long restaurantId) {

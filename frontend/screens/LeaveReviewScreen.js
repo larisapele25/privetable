@@ -16,7 +16,7 @@ export default function LeaveReviewScreen({ route, navigation }) {
   const submitReview = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await fetch('http://192.168.0.234:8080/api/reviews/user', {
+      const response = await fetch('http://192.168.0.150:8080/api/reviews/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

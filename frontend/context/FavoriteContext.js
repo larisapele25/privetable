@@ -34,15 +34,21 @@ export const FavoriteProvider = ({ children }) => {
 
   // Încarcă favoritele de pe backend
   const loadFavorites = async (id) => {
-    try {
-      const favRes = await API.get(`/users/${id}/favorites`);
-      const favoriteIds = favRes.data.map((r) => r.id);
-      setFavorites(favoriteIds);
-    } catch (error) {
-      console.error('❌ Eroare la încărcarea favoriteleor:', error.message);
-      setFavorites([]);
-    }
-  };
+  try {
+    const favRes = await API.get(`/users/${id}/favorites`);
+    console.log('✅ Favorites API response:', favRes.data);
+
+    // ACUM favRes.data ESTE direct lista DTO — deci merge direct:
+    const favoriteIds = favRes.data.map((r) => r.id);
+    setFavorites(favoriteIds);
+
+  } catch (error) {
+    console.error('❌ Eroare la încărcarea favoriteleor:', error.message);
+    setFavorites([]); // fallback gol
+  }
+};
+
+
 
   // Adaugă un restaurant la favorite
   const addFavorite = async (restaurantId) => {

@@ -12,4 +12,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByRecipientId(Long userId);
 
     List<Notification> findByRecipientIdAndDeletedFalseOrderByTimestampDesc(Long userId);
+
 }

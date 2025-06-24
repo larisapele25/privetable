@@ -1,5 +1,6 @@
 package com.bookatable.reservationapp.controller;
 
+import com.bookatable.reservationapp.dto.CartItemDTO;
 import com.bookatable.reservationapp.model.CartItem;
 import com.bookatable.reservationapp.service.CartItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,14 @@ public class CartItemController {
     }
 
     @GetMapping("/reservation/{reservationId}")
-    public ResponseEntity<List<CartItem>> getCartItems(@PathVariable Long reservationId) {
-        return ResponseEntity.ok(cartItemService.getCartItemsForReservation(reservationId));
+    public ResponseEntity<List<CartItemDTO>> getCartItems(@PathVariable Long reservationId) {
+        List<CartItem> items = cartItemService.getCartItemsForReservation(reservationId);
+        List<CartItemDTO> dtos = items.stream()
+                .map(CartItemDTO::new)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
+
 
     @GetMapping("/total/{reservationId}")
     public ResponseEntity<Double> getCartTotal(@PathVariable Long reservationId) {
