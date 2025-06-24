@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { HOST } from '../services/api';
 
 export default function LeaveReviewScreen({ route, navigation }) {
   const { reservationId, userList } = route.params;
@@ -16,19 +17,21 @@ export default function LeaveReviewScreen({ route, navigation }) {
   const submitReview = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await fetch('http://192.168.0.150:8080/api/reviews/user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          reservationId,
-          userId: selectedUser.id,
-          rating,
-          comment
-        })
-      });
+      const response = await fetch(`${HOST}/api/reviews/user`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`
+  },
+  body: JSON.stringify({
+    reservationId,
+    userId: selectedUser.id,
+    rating,
+    comment
+  })
+});
+
+      
 
       if (!response.ok) throw new Error('Eroare la trimitere');
 

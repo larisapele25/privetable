@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { API } from '../services/api';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { HOST, FILE_HOST } from '../services/api';
 
 const VerificationAdminScreen = () => {
   const [requests, setRequests] = useState([]);
@@ -54,7 +55,8 @@ const VerificationAdminScreen = () => {
   const getImageUrl = (fullPath) => {
     if (!fullPath) return '';
     const filename = fullPath.split(/[\\/]/).pop();
-    return `http://192.168.0.150:8080/uploads/${filename}`;
+   return `${FILE_HOST}/uploads/${filename}`;
+
   };
 
   return (

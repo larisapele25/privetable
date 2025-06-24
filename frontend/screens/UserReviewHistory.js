@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { API } from '../services/api';
 
 export default function UserReviewHistory({ route, navigation }) {
   const { userId, userEmail } = route.params;
@@ -13,13 +14,11 @@ export default function UserReviewHistory({ route, navigation }) {
   const fetchReviews = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.168.0.150:8080/api/reviews/about-user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+     const response = await API.get(`/reviews/about-user/${userId}`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+const data = response.data;
 
-      if (!response.ok) throw new Error('Failed to fetch reviews');
-
-      const data = await response.json();
       setReviews(data);
     } catch (error) {
       console.error('Error fetching reviews:', error);

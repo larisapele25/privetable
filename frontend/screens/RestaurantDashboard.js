@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { HOST } from '../services/api';
 
 export default function RestaurantDashboard({ navigation }) {
   const [selectedTab, setSelectedTab] = useState('reservations');
@@ -44,9 +45,10 @@ export default function RestaurantDashboard({ navigation }) {
         endpoint = `/api/restaurant/reservations/past`;
       }
 
-      const response = await fetch(`http://192.168.0.150:8080${endpoint}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(`${HOST}${endpoint}`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
 
       if (!response.ok) throw new Error('Eroare la încărcare');
 

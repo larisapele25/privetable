@@ -9,7 +9,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { API } from '../services/api';  
 
 export default function AddRestaurantScreen({ route }) {
   const { adminCode } = route.params;
@@ -23,36 +23,37 @@ export default function AddRestaurantScreen({ route }) {
   const [responseText, setResponseText] = useState('');
 
   const handleSubmit = async () => {
-    const { name, imageUrl, capacity } = form;
+  const { name, imageUrl, capacity } = form;
 
-    if (!name || !imageUrl || !capacity) {
-      Alert.alert('Error', 'All fields are required!');
-      return;
-    }
+  if (!name || !imageUrl || !capacity) {
+    Alert.alert('Error', 'All fields are required!');
+    return;
+  }
 
-    try {
-      const res = await axios.post(
-        'http://192.168.0.150:8080/api/admin/add-restaurant',
-        {
-          name,
-          imageUrl,
-          capacity: parseInt(capacity),
+  try {
+    const res = await API.post(
+      '/admin/add-restaurant',
+      {
+        name,
+        imageUrl,
+        capacity: parseInt(capacity),
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-ADMIN-CODE': adminCode,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-ADMIN-CODE': adminCode,
-          },
-        }
-      );
+      }
+    );
 
-      setResponseText(`✅ Restaurant added!\nLoginCode: ${res.data.loginCode}`);
-      setForm({ name: '', imageUrl: '', capacity: '' });
-    } catch (err) {
-      console.error(err);
-      Alert.alert('Eroare', err.response?.data || 'Ceva n-a mers.');
-    }
-  };
+    setResponseText(` Restaurant added!\nLoginCode: ${res.data.loginCode}`);
+    setForm({ name: '', imageUrl: '', capacity: '' });
+  } catch (err) {
+    console.error(err);
+    Alert.alert('Eroare', err.response?.data || 'Ceva n-a mers.');
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>

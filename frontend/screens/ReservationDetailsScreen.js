@@ -58,20 +58,24 @@ const ReservationDetailsScreen = () => {
 
   const handleCancelReservation = () => {
     Alert.alert(
-      'Confirmare',
-      'Ești sigur că vrei să anulezi rezervarea?',
+      'Confirmation',
+      'Are you sure you want to cancel your reservation?',
       [
-        { text: 'Nu' },
+        { text: 'No' },
         {
-          text: 'Da',
+          text: 'Yes',
           onPress: async () => {
             try {
               await API.post(`/reservations/${reservation.id}/cancel?userId=${userId}`);
-              Alert.alert("Rezervare anulată cu succes");
-              navigation.goBack();
+              Alert.alert("Reservation successfully canceled");
+              navigation.reset({
+  index: 0,
+  routes: [{ name: 'HomeMain' }],
+});
+
             } catch (error) {
-              const message = error?.response?.data?.message || 'A apărut o eroare.';
-              Alert.alert("Eroare", message);
+              const message = error?.response?.data?.message || 'An error occurred.';
+              Alert.alert("Error", message);
             }
           },
         },

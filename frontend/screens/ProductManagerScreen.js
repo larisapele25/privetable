@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
+import { HOST } from '../services/api';
 
 export default function ProductManagerScreen({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -17,9 +18,9 @@ export default function ProductManagerScreen({ navigation }) {
   const fetchProducts = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const res = await fetch('http://192.168.0.150:8080/api/restaurant/products', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+     const res = await fetch(`${HOST}/api/restaurant/products`, {
+  headers: { Authorization: `Bearer ${token}` },
+  });
       if (!res.ok) throw new Error('Error loading products');
       const data = await res.json();
       setProducts(data);
@@ -35,9 +36,10 @@ export default function ProductManagerScreen({ navigation }) {
     }
 
     const token = await AsyncStorage.getItem('token');
-    const url = editId
-      ? `http://192.168.0.150/api/restaurant/products/${editId}`
-      : `http://192.168.0.150:8080/api/restaurant/products`;
+   const url = editId
+  ? `${HOST}/api/restaurant/products/${editId}`
+  : `${HOST}/api/restaurant/products`;
+
 
     const method = editId ? 'PUT' : 'POST';
 
@@ -71,10 +73,11 @@ export default function ProductManagerScreen({ navigation }) {
         style: 'destructive',
         onPress: async () => {
           const token = await AsyncStorage.getItem('token');
-          const res = await fetch(`http://192.168.0.234:8080/api/restaurant/products/${id}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-          });
+         const res = await fetch(`${HOST}/api/restaurant/products/${id}`, {
+  method: 'DELETE',
+  headers: { Authorization: `Bearer ${token}` },
+});
+
           if (res.ok) {
             Alert.alert('Deleted', 'The product has been removed.');
             fetchProducts();

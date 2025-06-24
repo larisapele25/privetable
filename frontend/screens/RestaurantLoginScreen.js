@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { API } from '../services/api';
 
 export default function RestaurantLoginScreen({ navigation }) {
   const [loginCode, setLoginCode] = useState('');
@@ -11,27 +12,27 @@ export default function RestaurantLoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    try {
-      const response = await fetch('http://192.168.0.150:8080/api/restaurant/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ loginCode, password }),
-      });
+  try {
+    const response = await API.post('/restaurant/login', {
+      loginCode,
+      password,
+    });
 
-      if (!response.ok) throw new Error('Login failed');
+   
+    const data = response.data;
 
-      const data = await response.json();
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('restaurantId', data.restaurantId.toString());
-     await AsyncStorage.setItem('restaurantName', data.restaurantName);
+    await AsyncStorage.setItem('token', data.token);
+    await AsyncStorage.setItem('restaurantId', data.restaurantId.toString());
+    await AsyncStorage.setItem('restaurantName', data.restaurantName);
 
+    Alert.alert('Login successful', 'Welcome!');
+    navigation.navigate('RestaurantDashboard');
+  } catch (error) {
+    console.error(error);
+    Alert.alert('Authentication error', 'Check loginCode and password.');
+  }
+};
 
-      Alert.alert('Login successful', 'Welcome!');
-      navigation.navigate('RestaurantDashboard');
-    } catch (error) {
-      Alert.alert('Authentication error', 'Check loginCode and password.');
-    }
-  };
 
   return (
     <View style={styles.container}>
