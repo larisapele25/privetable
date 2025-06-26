@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,11 +103,13 @@ public class CartItemService {
     }
 
     public List<CartItem> getOrdersForDate(Long restaurantId, LocalDate date) {
-        return cartItemRepository.findByRestaurantIdAndDate(restaurantId, date);
+        return cartItemRepository.findByReservationDate(restaurantId, date);
     }
 
+
+
     public List<OrderDTO> getOrderDTOsForDate(Long restaurantId, LocalDate date) {
-        List<CartItem> items = cartItemRepository.findByRestaurantIdAndDate(restaurantId, date);
+        List<CartItem> items = cartItemRepository.findByReservationDate(restaurantId, date);
 
         return items.stream()
                 .map(item -> new OrderDTO(
@@ -119,6 +122,7 @@ public class CartItemService {
                 ))
                 .toList();
     }
+
 
 
 

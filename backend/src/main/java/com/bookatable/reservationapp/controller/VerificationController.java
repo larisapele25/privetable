@@ -61,9 +61,22 @@ public class VerificationController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utilizator inexistent.");
             }
 
-            if (verificationRepository.findByUserId(userId).isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ai deja o cerere de verificare trimisă.");
+            Optional<UserVerification> existing = verificationRepository.findByUserId(userId);
+            if (existing.isPresent()) {
+                UserVerification current = existing.get();
+
+                // Dacă cererea NU a fost încă evaluată sau a fost aprobată
+                if (!current.isReviewedByAdmin() || current.isVerificationStatus()) {
+                    return ResponseEntity
+                            .status(HttpStatus.CONFLICT)
+                            .body("Ai deja o cerere de verificare în așteptare sau aprobată.");
+                }
+
+                // Dacă a fost respinsă ⇒ ștergem înregistrarea
+                verificationRepository.delete(current);
             }
+
+
 
             VerificationRequestDTO dto = new VerificationRequestDTO();
             dto.setUserId(userId);

@@ -31,6 +31,14 @@ public class VerificationService {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        boolean hasActiveRequest = verificationRepository.findAllByUserId(user.getId()).stream()
+                .anyMatch(v -> !v.isReviewedByAdmin() && !v.isVerificationStatus());
+
+        if (hasActiveRequest) {
+            throw new IllegalStateException("You already have a pending verification request.");
+        }
+
+
         // Salvează imaginile cu nume sigure
         String frontPath = saveImage(dto.getFrontImage(), "front_" + user.getId());
         String backPath = saveImage(dto.getBackImage(), "back_" + user.getId());

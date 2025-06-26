@@ -19,9 +19,11 @@ public class CartItemController {
     private CartItemService cartItemService;
 
     @PostMapping("/add")
-    public ResponseEntity<CartItem> addToCart(@RequestBody CartItem cartItem) {
-        return new ResponseEntity<>(cartItemService.addToCart(cartItem), HttpStatus.CREATED);
+    public ResponseEntity<String> addToCart(@RequestBody CartItem cartItem) {
+        cartItemService.addToCart(cartItem);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Product added to cart successfully.");
     }
+
 
     @DeleteMapping("/remove/{reservationId}/{productId}")
     public ResponseEntity<Void> removeFromCart(@PathVariable Long reservationId, @PathVariable Long productId) {

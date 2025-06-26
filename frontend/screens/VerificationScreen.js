@@ -24,14 +24,14 @@ const VerificationScreen = ({ navigation }) => {
       const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
 
       if (mediaPermission.status !== 'granted' || cameraPermission.status !== 'granted') {
-        Alert.alert("Permisiuni necesare", "Trebuie permisiuni pentru cameră și galerie.");
+        Alert.alert("Permissions required.Camera and gallery permissions required.");
       }
 
       const storedId = await AsyncStorage.getItem('userId');
       if (storedId) {
         setUserId(parseInt(storedId));
       } else {
-        Alert.alert("Eroare", "Nu s-a putut prelua ID-ul utilizatorului.");
+        Alert.alert("Error", "Nu s-a putut prelua ID-ul utilizatorului.");
       }
     })();
   }, []);
@@ -61,7 +61,7 @@ const VerificationScreen = ({ navigation }) => {
 
   const submitVerification = async () => {
     if (!name || !surname || !cnp || !idNumber || !frontImage || !backImage) {
-      Alert.alert("Eroare", "Completează toate câmpurile și încarcă ambele imagini.");
+      Alert.alert("Error", "Complete all fields and upload both images.");
       return;
     }
 
@@ -90,22 +90,22 @@ const VerificationScreen = ({ navigation }) => {
     try {
       const response = await fetch(`${FILE_HOST}/api/verify/submit`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         body: formData,
       });
 
       if (response.ok) {
-        Alert.alert("Trimis", "Datele au fost trimise pentru verificare manuală.");
+        Alert.alert("Sent", "The data has been submitted for verification.");
         navigation.goBack();
       } else {
         const errorText = await response.text();
-        console.error("Eroare răspuns:", errorText);
-        Alert.alert("Eroare", "Trimiterea a eșuat.");
+        //console.error("Eroare răspuns:", errorText);
+        Alert.alert("Error", "You already have a request sent.");
       }
     } catch (error) {
-      console.error("Eroare submit:", error);
+     console.log("URL:", `${FILE_HOST}/api/verify/submit`);
+console.log("FormData:", formData);
+console.error("Eroare submit:", error);
+
       Alert.alert("Eroare", "A apărut o eroare la trimitere.");
     }
   };

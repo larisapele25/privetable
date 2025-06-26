@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users") // evităm keyword-ul "user"
@@ -28,9 +26,9 @@ public class User {
     private String resetCode;
     private Instant resetCodeTimestamp;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user")
-    private UserVerification userVerification;
+    private List<UserVerification> userVerifications = new ArrayList<>();
 
 
     @Column(name = "is_verified")
@@ -63,11 +61,25 @@ public class User {
     }
 
     // Getters
-    public Long getId() { return id; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getEmail() { return email; }
-    public String getPassword() { return password; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 
     public String getProvider() {
         return provider;
@@ -78,11 +90,25 @@ public class User {
     }
 
     // Setters
-    public void setId(Long id) { this.id = id; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getResetCode() {
         return resetCode;
@@ -99,6 +125,7 @@ public class User {
     public void setResetCodeTimestamp(LocalDateTime resetCodeTimestamp) {
         this.resetCodeTimestamp = resetCodeTimestamp != null ? resetCodeTimestamp.atZone(ZoneId.systemDefault()).toInstant() : null;
     }
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_favorites",
@@ -132,11 +159,10 @@ public class User {
         this.verified = verified;
     }
 
-    public UserVerification getUserVerification() {
-        return userVerification;
+    public List<UserVerification> getUserVerifications() {
+        return userVerifications;
     }
-
-    public void setUserVerification(UserVerification userVerification) {
-        this.userVerification = userVerification;
+    public void setUserVerifications(List<UserVerification> userVerifications) {
+        this.userVerifications = userVerifications;
     }
 }

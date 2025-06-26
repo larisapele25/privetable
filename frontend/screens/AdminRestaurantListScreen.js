@@ -16,7 +16,7 @@ export default function AdminRestaurantListScreen({ route }) {
     .then(res => setRestaurants(res.data))
     .catch(err => {
       console.error(err);
-      Alert.alert('Eroare', 'Nu s-au putut încărca restaurantele');
+      Alert.alert('Error', 'The restaurants could not be loaded.');
     });
   }, []);
 

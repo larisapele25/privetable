@@ -22,10 +22,11 @@ public class UserVerification {
     // 🔍 Adăugate pentru validare manuală
     private boolean reviewedByAdmin = false;
     private String adminComment;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("userVerification")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("userVerifications")
     private User user;
+
 
     public UserVerification() {}
 
