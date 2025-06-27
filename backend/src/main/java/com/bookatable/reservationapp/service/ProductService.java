@@ -36,7 +36,7 @@ public class ProductService {
         this.notificationRepository = notificationRepository;
     }
 
-    // ✅ Returnează toate produsele sub formă de DTO
+    //  Returnează toate produsele sub formă de DTO
     public List<ProductDTO> getProductsByRestaurant(Long restaurantId) {
         return productRepository.findByRestaurantId(restaurantId).stream()
                 .map(p -> new ProductDTO(

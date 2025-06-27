@@ -50,13 +50,13 @@ export default function RestaurantDashboard({ navigation }) {
 });
 
 
-      if (!response.ok) throw new Error('Eroare la încărcare');
+      if (!response.ok) throw new Error('Loading error');
 
       const result = await response.json();
       setData(result);
     } catch (err) {
       console.error(err);
-      Alert.alert('Eroare', 'Nu s-au putut încărca datele.');
+      Alert.alert('Error', 'Could not load data.');
     }
   };
 
@@ -67,7 +67,7 @@ export default function RestaurantDashboard({ navigation }) {
       await AsyncStorage.removeItem('restaurantName');
       navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
     } catch {
-      Alert.alert('Eroare la logout');
+      Alert.alert('Logout error');
     }
   };
 
@@ -104,7 +104,7 @@ export default function RestaurantDashboard({ navigation }) {
       const stars = '⭐'.repeat(item.rating);
       const date = item.reservationDateTime
         ? new Date(item.reservationDateTime).toLocaleDateString()
-        : 'Data indisponibilă';
+        : 'Date unavailable';
 
       return (
         <View style={styles.card}>

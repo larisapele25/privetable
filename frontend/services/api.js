@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const HOST = 'http://192.168.0.150:8080';
+export const HOST = 'http://192.168.0.234:8080';
 
 export const FILE_HOST = HOST;
 

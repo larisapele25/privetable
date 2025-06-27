@@ -56,7 +56,6 @@ import java.util.Set;
             userService.addFavorite(userId, restaurantId);
             return ResponseEntity.ok().build();
         }
-
         @DeleteMapping("/{userId}/favorites/{restaurantId}")
         public ResponseEntity<Void> removeFavorite(
                 @PathVariable Long userId,
@@ -71,7 +70,7 @@ import java.util.Set;
                 user.getId(),
                 user.getFirstName(),
                 user.getEmail(),
-                user.isVerified() // presupunem că ai acest câmp în model
+                user.isVerified()
         );
     }
     @PutMapping("/change-password")

@@ -19,7 +19,7 @@ public class UserVerification {
     private String backImagePath;
     private boolean verificationStatus;
 
-    // 🔍 Adăugate pentru validare manuală
+    //  Adăugate pentru validare manuală
     private boolean reviewedByAdmin = false;
     private String adminComment;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +40,7 @@ public class UserVerification {
         this.verificationStatus = verificationStatus;
     }
 
-    // Getteri și setteri
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

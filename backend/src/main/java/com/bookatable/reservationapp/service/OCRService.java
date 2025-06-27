@@ -43,13 +43,13 @@ public class OCRService {
     public Map<String, String> extractFieldsFromOcr(String ocrText) {
         Map<String, String> fields = new HashMap<>();
 
-        // 🔍 CNP din linia care conține „CNP”
+        //  CNP din linia care conține „CNP”
         Matcher cnpLineMatcher = Pattern.compile("(?i)CNP[^\\d]*(\\d{13})").matcher(ocrText);
         if (cnpLineMatcher.find()) {
             fields.put("cnp", cnpLineMatcher.group(1));
         }
 
-        // 🔁 Fallback: 13 cifre oriunde
+        //  Fallback: 13 cifre oriunde
         if (!fields.containsKey("cnp")) {
             Matcher cnpMatcher = Pattern.compile("\\b\\d{13}\\b").matcher(ocrText);
             if (cnpMatcher.find()) {
@@ -57,7 +57,7 @@ public class OCRService {
             }
         }
 
-        // 🔍 Nume + Prenume din MRZ (IDROU...)
+        //  Nume + Prenume din MRZ (IDROU...)
         Matcher mrzMatcher = Pattern.compile("IDROU[A-Z0-9<]+").matcher(ocrText);
         if (mrzMatcher.find()) {
             String mrz = mrzMatcher.group().replace("IDROU", "");
@@ -72,13 +72,13 @@ public class OCRService {
             }
         }
 
-        // 🔍 ID din linia a doua MRZ — ex: ZH310845<
+        //  ID din linia a doua MRZ — ex: ZH310845<
         Matcher secondMrzLineMatcher = Pattern.compile("(?m)^([A-Z]{2}\\d{6})<").matcher(ocrText);
         if (secondMrzLineMatcher.find()) {
             fields.put("id", secondMrzLineMatcher.group(1));
         }
 
-        // 🔁 Fallback pentru ID dacă nu apare în MRZ
+        //  Fallback pentru ID dacă nu apare în MRZ
         if (!fields.containsKey("id")) {
             Matcher idMatcher = Pattern.compile("\\b[A-Z]{2}\\s?\\d{6}\\b").matcher(ocrText);
             if (idMatcher.find()) {
@@ -86,7 +86,7 @@ public class OCRService {
             }
         }
 
-        // 🔁 Fallback pentru nume și prenume (dacă nu e MRZ valid)
+        //  Fallback pentru nume și prenume (dacă nu e MRZ valid)
         if (!fields.containsKey("surname")) {
             Matcher lastNameMatcher = Pattern.compile("(?i)\\bNume\\b[^\\n\\r:]*[:\\s]+([A-ZĂÂÎȘȚa-zăâîșț\\-]+)").matcher(ocrText);
             if (lastNameMatcher.find()) {

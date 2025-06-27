@@ -45,7 +45,7 @@ public class UserService {
 
         user.addFavoriteRestaurant(restaurant); // adaugă în listă
 
-        userRepository.save(user); // ← AICI trebuie să salvezi schimbarea!
+        userRepository.save(user);
     }
 
 

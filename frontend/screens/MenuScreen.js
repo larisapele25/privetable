@@ -96,7 +96,7 @@ console.log("cart:", cart);
   return (
     <ScrollView style={styles.container}>
       {readOnly && (
-        <Text style={styles.readOnlyBanner}>Acesta este doar un preview al meniului</Text>
+        <Text style={styles.readOnlyBanner}>This is just a preview of the menu.</Text>
       )}
 
       {Object.keys(grouped).map(category => (

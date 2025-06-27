@@ -53,8 +53,8 @@ const VerificationScreen = ({ navigation }) => {
         if (type === 'front') setFrontImage(newPath);
         else setBackImage(newPath);
       } catch (err) {
-        console.error('Eroare la copiere:', err);
-        Alert.alert("Eroare", "Imaginea nu a putut fi salvată.");
+        console.error('Copy error:', err);
+        Alert.alert("Error", "The image could not be saved.");
       }
     }
   };
@@ -66,7 +66,7 @@ const VerificationScreen = ({ navigation }) => {
     }
 
     if (!userId) {
-      Alert.alert("Eroare", "ID-ul utilizatorului nu a fost găsit.");
+      Alert.alert("Error", "User ID not found.");
       return;
     }
 
@@ -106,7 +106,7 @@ const VerificationScreen = ({ navigation }) => {
 console.log("FormData:", formData);
 console.error("Eroare submit:", error);
 
-      Alert.alert("Eroare", "A apărut o eroare la trimitere.");
+      Alert.alert("Error", "An error occurred while sending.");
     }
   };
 

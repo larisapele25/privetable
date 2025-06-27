@@ -19,7 +19,7 @@ public class UserDTO {
         return new UserDTO(user.getId(), user.getFirstName(),user.getEmail(),  user.isVerified());
     }
 
-    // Getters
+
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }

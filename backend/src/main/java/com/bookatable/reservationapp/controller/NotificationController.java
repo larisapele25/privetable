@@ -54,7 +54,7 @@ public class NotificationController {
             n.setRead(true);
         }
         notificationRepository.saveAll(notifications);
-        return ResponseEntity.ok("Notificările au fost marcate ca citite");
+        return ResponseEntity.ok("Notifications have been marked as read");
     }
 
 
@@ -83,7 +83,7 @@ public class NotificationController {
         }
 
         notificationRepository.saveAll(toMarkDeleted);
-        return ResponseEntity.ok("Notificările au fost marcate ca șterse.");
+        return ResponseEntity.ok("Notifications have been marked as deleted.");
     }
 
 

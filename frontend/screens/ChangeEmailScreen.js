@@ -73,7 +73,7 @@ useEffect(() => {
       const errorMessage =
         err?.response?.data?.message ??
         err?.response?.data?.error ??
-        'A apărut o eroare la schimbarea emailului.';
+        'An error occurred while changing the email.';
       Alert.alert('Eroare', errorMessage);
     }
   };

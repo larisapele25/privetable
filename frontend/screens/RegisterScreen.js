@@ -32,19 +32,19 @@ export default function RegisterScreen({ navigation }) {
   const handleRegister = () => {
 
     if (!name || !surname || !email || !confirmEmail || !password || !confirmPassword) {
-        return Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii.');
+        return Alert.alert('Error', 'All fields are required.');
       }
       
     if (email !== confirmEmail) {
-      return Alert.alert('Eroare', 'Emailurile nu coincid');
+      return Alert.alert('Error', 'Emails do not match');
     }
     if (password !== confirmPassword) {
-      return Alert.alert('Eroare', 'Parolele nu coincid');
+      return Alert.alert('Error', 'Passwords do not match');
     }
     if (!isPasswordValid(password)) {
       return Alert.alert(
-        'Eroare',
-        'Parola nu respectă cerințele de securitate.'
+        'Error',
+        'The password does not meet security requirements.'
       );
     }
     
@@ -64,29 +64,29 @@ export default function RegisterScreen({ navigation }) {
           typeof data === 'string' &&
           data.toLowerCase().includes('email')
         ) {
-          Alert.alert('Eroare', 'Acest email este deja folosit.');
+          Alert.alert('Error', 'This email is already in use.');
           return;
         }
 
-        Alert.alert('Succes', 'Cont creat cu succes');
+        Alert.alert('Succes', 'Account created successfully');
         navigation.navigate('Login');
       })
       .catch((err) => {
         const fullError = err.response;
-        console.log('Eroare completă:', JSON.stringify(fullError, null, 2));
+        console.log('Complete error:', JSON.stringify(fullError, null, 2));
 
         const message =
           fullError?.data?.message ||
           fullError?.data ||
-          'Ceva n-a mers la înregistrare';
+          'Something went wrong.';
 
         if (
           fullError?.status === 409 ||
           message.toLowerCase().includes('email')
         ) {
-          Alert.alert('Eroare', 'Acest email este deja folosit.');
+          Alert.alert('Error', 'This email is already used.');
         } else {
-          Alert.alert('Eroare', message);
+          Alert.alert('Error', message);
         }
       });
   };

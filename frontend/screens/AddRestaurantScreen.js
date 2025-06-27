@@ -50,7 +50,7 @@ export default function AddRestaurantScreen({ route }) {
     setForm({ name: '', imageUrl: '', capacity: '' });
   } catch (err) {
     console.error(err);
-    Alert.alert('Eroare', err.response?.data || 'Ceva n-a mers.');
+    Alert.alert('Error', err.response?.data || 'Something went wrong.');
   }
 };
 

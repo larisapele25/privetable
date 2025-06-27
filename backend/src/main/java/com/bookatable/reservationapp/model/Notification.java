@@ -19,7 +19,7 @@ public class Notification {
 
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    private String type; // ex: "INVITE", "SYSTEM", etc.
+    private String type;
 
     private Long reservationId;
 

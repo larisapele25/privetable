@@ -179,7 +179,7 @@ public class ReservationService {
         User user = userRepository.findById(userId).orElseThrow();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow();
 
-        // 🔁 1. Verificare suprapunere rezervări EXISTENTE ale utilizatorului
+        //  1. Verificare suprapunere rezervări EXISTENTE ale utilizatorului
         List<Reservation> userReservations = reservationRepository.findByUserAndDateTimeBetween(
                 user,
                 date.atStartOfDay(),
@@ -199,7 +199,7 @@ public class ReservationService {
             }
         }
 
-        // 🔁 2. Verificare capacitate pentru restaurant
+        //  2. Verificare capacitate pentru restaurant
         List<Reservation> existingReservations = reservationRepository.findByRestaurantIdAndDate(restaurantId, date);
         int MAX_SEATS = 20;
         int seatsTaken = 0;

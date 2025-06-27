@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    // Rezervări viitoare pentru un user
+
     List<Reservation> findByUserAndDateTimeAfterOrderByDateTimeAsc(User user, LocalDateTime now);
 
     // Rezervări trecute pentru un user (pentru Book Again)
@@ -30,7 +30,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByUserAndDateTimeBetween(User user, LocalDateTime start, LocalDateTime end);
 
-    //adaugari
+
     List<Reservation> findByUser(User user);
     List<Reservation> findByParticipantsContaining(User user);
     List<Reservation> findByDateTimeBetweenAndNotifiedFalse(LocalDateTime start, LocalDateTime end);

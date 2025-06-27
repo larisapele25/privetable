@@ -30,7 +30,7 @@ public class VerificationResponseDTO {
         this.adminComment = v.getAdminComment();
     }
 
-    // Getters only (nu ai nevoie de setters la response)
+    // Getters only (nu am nevoie de setters la response)
     public Long getId() { return id; }
     public Long getUserId() { return userId; }
     public String getName() { return name; }

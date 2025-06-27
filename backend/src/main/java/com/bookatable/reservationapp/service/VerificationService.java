@@ -57,7 +57,7 @@ public class VerificationService {
 
         UserVerification saved = verificationRepository.save(verification);
 
-        System.out.println("✅ Verificare salvată pentru userId=" + user.getId());
+        System.out.println(" Verificare salvată pentru userId=" + user.getId());
         return saved;
     }
 
@@ -75,7 +75,7 @@ public class VerificationService {
 
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        System.out.println("✅ Fișier salvat: " + filePath.toAbsolutePath());
+        System.out.println(" Fișier salvat: " + filePath.toAbsolutePath());
         return filePath.toString();
     }
 }

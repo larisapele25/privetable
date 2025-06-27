@@ -56,7 +56,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
-        return ResponseEntity.ok("Parola a fost resetată cu succes.");
+        return ResponseEntity.ok("The password has been reset successfully.");
     }
 
     @PostMapping("/firebase-login")
@@ -64,7 +64,7 @@ public class AuthController {
         String idToken = body.get("token");
 
         try {
-            // Verifici tokenul primit de la frontend cu Firebase Admin SDK
+
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
             String email = decodedToken.getEmail();
             String name = (String) decodedToken.getClaims().get("name");

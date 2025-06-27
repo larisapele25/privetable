@@ -17,11 +17,11 @@ const CartScreen = () => {
   API.get(`/cart/reservation/${reservationId}`)
     .then(response => {
       console.log("Cart items response:", response.data);
-      setCartItems(response.data);  //  răspunsul e lista DTO directă
+      setCartItems(response.data);  
     })
     .catch(error => {
       console.error('Error fetching cart items:', error);
-      setCartItems([]); // fallback dacă e eroare
+      setCartItems([]); 
     });
 };
 

@@ -58,7 +58,7 @@ public class VerificationController {
 
             Optional<User> userOpt = userRepository.findById(userId);
             if (userOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utilizator inexistent.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist..");
             }
 
             Optional<UserVerification> existing = verificationRepository.findByUserId(userId);
@@ -69,10 +69,10 @@ public class VerificationController {
                 if (!current.isReviewedByAdmin() || current.isVerificationStatus()) {
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
-                            .body("Ai deja o cerere de verificare în așteptare sau aprobată.");
+                            .body("You already have a pending or approved verification request.");
                 }
 
-                // Dacă a fost respinsă ⇒ ștergem înregistrarea
+                // Dacă a fost respinsă  ștergem înregistrarea
                 verificationRepository.delete(current);
             }
 

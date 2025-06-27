@@ -13,7 +13,7 @@ public class VerificationRequestDTO {
 
     private Long userId; // ID-ul utilizatorului care face verificarea
 
-    // Getters and Setters
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 

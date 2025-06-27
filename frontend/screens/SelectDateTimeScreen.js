@@ -122,7 +122,7 @@ const SelectDateTimeScreen = ({ route }) => {
         `Restaurant: ${restaurant.name}\nDate: ${selectedDate.toDateString()}\nHour: ${hour}\nPeople: ${numPersons}\nDuration: ${duration}h`
       );
     } catch (err) {
-      console.log('Eroare la rezervare:', err?.response?.data || err.message); 
+      console.log('Booking error:', err?.response?.data || err.message); 
       Alert.alert(
         'Error',
         'The reservation could not be made. Please check if you already have one during the same time slot.'

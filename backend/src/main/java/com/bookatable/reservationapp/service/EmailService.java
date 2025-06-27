@@ -12,7 +12,7 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     public void sendResetCodeEmail(String to, String code) {
-        System.out.println("📧 Trimit email resetare către: " + to);
+        System.out.println(" Trimit email resetare către: " + to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Reset password - PrivéTable\n");
@@ -35,7 +35,7 @@ public class EmailService {
     }
 
     public void sendReviewRequestEmail(String to, String name, String restaurantName) {
-        System.out.println("📨 Trimit cerere review către: " + to);
+        System.out.println(" Trimit cerere review către: " + to);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -54,7 +54,7 @@ public class EmailService {
     }
 
     public void sendReviewReceivedEmail(String to, String userName, String restaurantName, int rating, String comment) {
-        System.out.println("📨 Trimit email de review primit către: " + to);
+        System.out.println(" Trimit email de review primit către: " + to);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

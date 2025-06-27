@@ -23,9 +23,9 @@ public class RestaurantLogin {
 
     private final RestaurantAccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService; // Sau orice sistem de token folosești
-private final RestaurantAccountService restaurantAccountService;
-private final RestaurantRepository restaurantRepository;
+    private final JwtService jwtService;
+    private final RestaurantAccountService restaurantAccountService;
+    private final RestaurantRepository restaurantRepository;
     public RestaurantLogin(RestaurantAccountRepository repo, PasswordEncoder encoder, JwtService jwtService, RestaurantAccountService restaurantAccountService, RestaurantRepository restaurantRepository) {
         this.accountRepository = repo;
         this.passwordEncoder = encoder;

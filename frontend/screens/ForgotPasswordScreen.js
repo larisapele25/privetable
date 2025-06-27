@@ -9,17 +9,17 @@ export default function ForgotPasswordScreen({ navigation }) {
 
   const handleSendCode = () => {
     if (!email.includes('@')) {
-      return Alert.alert('Eroare', 'Introdu un email valid.');
+      return Alert.alert('Error', 'Please enter a valid email.');
     }
 
     // aici se trimite codul spre email
     API.post('/auth/forgot-password', { email })
       .then(() => {
-        Alert.alert('Succes', 'Verifică-ți emailul.');
+        Alert.alert('Succes', 'Check your email.');
         navigation.navigate('ResetPassword', { email }); // trimitem emailul mai departe
       })
       .catch(() => {
-        Alert.alert('Eroare', 'Nu s-a putut trimite codul de resetare.');
+        Alert.alert('Error', 'Unable to send reset code.');
       });
   };
 

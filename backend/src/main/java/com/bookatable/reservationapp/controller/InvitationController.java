@@ -57,7 +57,7 @@ public class InvitationController {
         int maxPeople = reservation.getNumberOfPeople();
 
         if (totalJoined >= maxPeople) {
-            return ResponseEntity.badRequest().body("Limită de participanți atinsă");
+            return ResponseEntity.badRequest().body("Participant limit reached");
         }
 
         // Salvăm invitația

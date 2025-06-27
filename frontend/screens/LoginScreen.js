@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      return Alert.alert('Eroare', 'Completează toate câmpurile.');
+      return Alert.alert('Error', 'Complete all fields.');
     }
 
     try {
@@ -44,22 +44,22 @@ export default function LoginScreen({ navigation }) {
 
       const { userId } = res.data;
 
-      // 🔑 Salvează și setează userId
+      //  Salvează și setează userId
       await AsyncStorage.setItem('userId', userId.toString());
       setUserId(userId);
 
-      // 🔁 Încarcă favoritele după login
+      //  Încarcă favoritele după login
       await loadFavorites(userId);
 
-      // 🔁 Navigare în aplicație
+      //  Navigare în aplicație
       navigation.reset({
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
 
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Email sau parolă greșite';
-      Alert.alert('Eroare', errorMsg);
+      const errorMsg = err.response?.data?.message || 'Wrong email or password';
+      Alert.alert('Error', errorMsg);
     }
   };
 

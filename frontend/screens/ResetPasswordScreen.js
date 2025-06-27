@@ -35,7 +35,7 @@ export default function ResetPasswordScreen({ route, navigation }) {
 
   const handleReset = () => {
     if (newPassword !== confirmPassword) {
-      return Alert.alert('Eroare', 'Parolele nu coincid.');
+      return Alert.alert('Error', 'The passwords do not match.');
     }
 
     API.post('/auth/reset-password', {
@@ -45,11 +45,11 @@ export default function ResetPasswordScreen({ route, navigation }) {
       confirmPassword,
     })
       .then(() => {
-        Alert.alert('Succes', 'Parola a fost schimbată.');
+        Alert.alert('Succes', 'The password has been changed.');
         navigation.navigate('Login');
       })
       .catch(() => {
-        Alert.alert('Eroare', 'Cod invalid sau expirat.');
+        Alert.alert('Error', 'Invalid or expired code.');
       });
   };
 

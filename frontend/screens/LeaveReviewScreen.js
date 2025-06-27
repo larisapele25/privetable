@@ -33,13 +33,13 @@ export default function LeaveReviewScreen({ route, navigation }) {
 
       
 
-      if (!response.ok) throw new Error('Eroare la trimitere');
+      if (!response.ok) throw new Error('Error sending');
 
-      Alert.alert('Succes', 'Review trimis!');
+      Alert.alert('Succes', 'Review sent!');
       navigation.goBack();
     } catch (err) {
       console.error(err);
-      Alert.alert('Eroare', 'Nu s-a putut trimite review-ul.');
+      Alert.alert('Error', 'Could not send review.');
     }
   };
 

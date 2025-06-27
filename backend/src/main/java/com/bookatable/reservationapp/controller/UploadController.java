@@ -15,7 +15,7 @@ public class UploadController {
 
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
-        Path uploadDir = Path.of("uploads").toAbsolutePath(); // același ca în VerificationService
+        Path uploadDir = Path.of("uploads").toAbsolutePath();
         Path file = uploadDir.resolve(filename);
 
         if (!Files.exists(file)) {

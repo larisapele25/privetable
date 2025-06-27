@@ -26,7 +26,7 @@ const FavoritesScreen = () => {
           const filtered = res.data.filter((r) => favorites.includes(r.id));
           setRestaurants(filtered);
         } catch (err) {
-          console.log('Eroare la încărcarea restaurantelor:', err.message);
+          console.log('Error loading restaurants:', err.message);
         } finally {
           setLoading(false);
         }

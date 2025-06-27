@@ -20,12 +20,12 @@ export default function ReviewScreen() {
 
   const handleSubmit = async () => {
     if (!reservationId || !userId || !restaurantId) {
-      Alert.alert('Eroare', 'Lipsesc informații esențiale din link.');
+      Alert.alert('Error', 'Essential information is missing from the link.');
       return;
     }
 
     if (rating === 0) {
-      Alert.alert('Atenție', 'Te rugăm să alegi un rating.');
+      Alert.alert('Attention', 'Please choose a rating.');
       return;
     }
 
@@ -37,7 +37,7 @@ export default function ReviewScreen() {
         rating,
         comment,
       });
-Alert.alert('Mulțumim!', 'Review-ul tău a fost trimis cu succes.');
+Alert.alert('Thank you!', 'Your review has been submitted successfully.');
 navigation.reset({
   index: 0,
   routes: [{ name: 'MainTabs' }],
@@ -45,7 +45,7 @@ navigation.reset({
 
     } catch (err) {
      
-      Alert.alert('Eroare', 'Ai trimis deja un review.');
+      Alert.alert('Error', 'You have already submitted a review.');
     }
   };
 

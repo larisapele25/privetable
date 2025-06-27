@@ -22,7 +22,7 @@ public class Product {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    // Constructors
+
     public Product() {}
 
     public Product(String name, String description, Double price, String category, Restaurant restaurant) {

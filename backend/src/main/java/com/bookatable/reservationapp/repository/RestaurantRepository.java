@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    // deocamdată nu ai nevoie de metode custom aici
+
     @Query("""
         SELECT new com.bookatable.reservationapp.dto.RestaurantWithRatingDTO(
             r.id, r.name, r.imageUrl, AVG(rv.rating)

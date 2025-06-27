@@ -9,7 +9,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Entity
-@Table(name = "users") // evităm keyword-ul "user"
+@Table(name = "users") // evit keyword-ul "user"
 public class User {
 
     @Id
@@ -34,7 +34,7 @@ public class User {
     @Column(name = "is_verified")
     private boolean verified = false;
 
-    private String provider; // ex: GOOGLE
+    private String provider;
 
     public User() {
     }

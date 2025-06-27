@@ -8,7 +8,7 @@ public class ReviewWithUserEmailDTO {
     private String userEmail;
     private LocalDateTime reservationDateTime;
 
-    // Getters & setters
+
     public int getRating() { return rating; }
     public void setRating(int rating) { this.rating = rating; }
 

@@ -26,7 +26,7 @@ public class Invitation {
         this.accepted = false;
     }
 
-    // Getters and Setters
+
     public Long getId() { return id; }
 
     public User getInvitedUser() { return invitedUser; }

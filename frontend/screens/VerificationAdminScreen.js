@@ -26,17 +26,17 @@ const VerificationAdminScreen = () => {
       setRequests(res.data);
     } catch (err) {
       console.error('Eroare la fetch:', err);
-      Alert.alert('Eroare', 'Nu s-au putut încărca cererile de verificare.');
+      Alert.alert('Error', 'Could not load verification requests.');
     }
   };
 
   const handleApprove = async (id) => {
     try {
       await API.put(`/verify/${id}/approve`);
-      Alert.alert('Succes', 'Verificare aprobată');
+      Alert.alert('Succes', 'Approved verification');
       fetchVerifications();
     } catch (err) {
-      Alert.alert('Eroare', 'Nu s-a putut aproba verificarea.');
+      Alert.alert('Error', 'Verification could not be approved.');
     }
   };
 
@@ -45,10 +45,10 @@ const VerificationAdminScreen = () => {
       await API.put(`/verify/${id}/reject`, null, {
         params: { comment }
       });
-      Alert.alert('Succes', 'Verificare respinsă');
+      Alert.alert('Succes', 'Verification rejected');
       fetchVerifications();
     } catch (err) {
-      Alert.alert('Eroare', 'Nu s-a putut respinge verificarea.');
+      Alert.alert('Error', 'Verification could not be rejected.');
     }
   };
 

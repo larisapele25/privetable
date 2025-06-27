@@ -130,7 +130,7 @@ public class ReservationController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<String> cancelReservation(
             @PathVariable Long id,
-            @RequestParam Long userId // sau extragi din JWT dacă ai autentificare
+            @RequestParam Long userId
     ) {
         reservationService.cancelReservation(id, userId);
         return ResponseEntity.ok("Rezervarea a fost anulată");

@@ -60,9 +60,9 @@ await API.put('/users/change-password', {
     } catch(err){  const errorMessage =
         err?.response?.data?.message ??
         err?.response?.data?.error ??
-        'A apărut o eroare la schimbarea parolei.';
+        'An error occurred while changing your password.';
       
-      Alert.alert('Eroare', errorMessage);
+      Alert.alert('Error', errorMessage);
       
   };
   }
